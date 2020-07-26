@@ -1,4 +1,4 @@
-import net_packet,app,m2k_lib,chat,sys,background,chr,player,m2k_lib,Levelbot
+import net_packet,app,m2k_lib,chat,sys,background,chr,player,m2k_lib,Levelbot,time
 import Movement
 
         
@@ -31,9 +31,16 @@ import Movement
 #b.append(3)
 #b.extend(strr)
 
-Movement = reload(Movement)
+#Movement = reload(Movement)
+#player.GetTargetVID()
+#net_packet.SendAttackPacket(player.GetTargetVID(),0)
+x,y,z = chr.GetPixelPosition(player.GetTargetVID())
 
-chat.AppendChat(3,str("Done"))
+net_packet.SendStatePacket(x,y,0,1,0)
+net_packet.SendStatePacket(x,y,0,0,0)
+net_packet.SendStatePacket(x,y,0,3,14)
+net_packet.SendAttackPacket(player.GetTargetVID(),0)
+chat.AppendChat(3,str(player.GetTargetVID()))
 #net_packet.SendPacket(len(b),b)
 #Movement = reload(Movement)
 #Levelbot = reload(Levelbot)

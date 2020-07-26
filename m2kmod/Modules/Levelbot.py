@@ -15,8 +15,6 @@ class LevelbotDialog(ui.ScriptWindow):
 	RestartPot = 0
 	SkillCount = 0
 	SkillIndex = 0
-	METIN_TYPE = 2
-	MONSTER_TYPE = 0
 	DIST_TO_ATTACK = 280
 	MIN_SPEED = 200 
 	
@@ -460,11 +458,11 @@ class LevelbotDialog(ui.ScriptWindow):
 			else:
 				target = -1
 				if(self.MetinButton.isOn):
-					target = getClosestInstance(self.METIN_TYPE)
+					target = getClosestInstance(m2k_lib.METIN_TYPE)
 
 			#if(self.BossButton.isOn):
 				if(self.MonsterButton.isOn and target == -1):
-					target = getClosestInstance(self.MONSTER_TYPE)
+					target = getClosestInstance(m2k_lib.MONSTER_TYPE)
 				#chat.AppendChat(3,"Target = "+ str(chr.GetNameByVID(self.Target)))
 				self.Target = target
 				if self.Pick:
@@ -602,7 +600,7 @@ def isPlayerCloseToInstance(vid_target):
 	for vid in net_packet.InstancesList:
 		if not chr.HasInstance(vid):
 			continue
-		if chr.GetInstanceType(vid) == 6 and vid != my_vid:
+		if chr.GetInstanceType(vid) == m2k_lib.PLAYER_TYPE and vid != my_vid:
 			curr_x,curr_y,z = chr.GetPixelPosition(vid)
 			distance = dist(target_x,target_y,curr_x,curr_y)
 			if(distance < 300):

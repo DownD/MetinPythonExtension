@@ -1,5 +1,6 @@
 import ui,app,chat,chr,net,player,item,skill,time,game,shop,chrmgr,m2k_lib
 import background,constInfo,miniMap,wndMgr,math,uiCommon,grp
+from DmgHacks import Dmg
 
 class SettingsDialog(ui.ScriptWindow): 				
 	
@@ -27,10 +28,11 @@ class SettingsDialog(ui.ScriptWindow):
 		self.AttackSpeedButton = self.comp.Button(self.Board, '', 'Attack-Speed', 25, 30, self.SetAttackSpeed, 'm2kmod/Images/Shortcuts/attack_0.tga', 'm2kmod/Images/Shortcuts/attack_1.tga', 'm2kmod/Images/Shortcuts/attack_0.tga')
 		self.MoveSpeedButton = self.comp.Button(self.Board, '', 'Move-Speed', 25, 70, self.SetMoveSpeed, 'm2kmod/Images/Shortcuts/move_0.tga', 'm2kmod/Images/Shortcuts/move_1.tga', 'm2kmod/Images/Shortcuts/move_0.tga')
 		self.DayButton = self.comp.Button(self.Board, '', 'Day', 25, 120, self.SetDay, 'm2kmod/Images/General/sun_0.tga', 'm2kmod/Images/General/sun_1.tga', 'm2kmod/Images/General/sun_0.tga')
-		self.NightButton = self.comp.Button(self.Board, '', 'Night', 90, 120, self.SetNight, 'm2kmod/Images/General/moon_0.tga', 'm2kmod/Images/General/moon_1.tga', 'm2kmod/Images/General/moon_0.tga')
-		self.OneHandedButton = self.comp.Button(self.Board, '', 'One-Handed', 180, 120, self.SetOneHand, 'm2kmod/Images/General/onehand_0.tga', 'm2kmod/Images/General/onehand_1.tga', 'm2kmod/Images/General/onehand_0.tga')
+		self.NightButton = self.comp.Button(self.Board, '', 'Night', 80, 120, self.SetNight, 'm2kmod/Images/General/moon_0.tga', 'm2kmod/Images/General/moon_1.tga', 'm2kmod/Images/General/moon_0.tga')
+		self.DmgMenuButton = self.comp.Button(self.Board, '', 'Damage Hacks', 133, 120, self.OpenDmgMenu, 'm2kmod/Images/General/dmg_0.png', 'm2kmod/Images/General/dmg_1.png', 'm2kmod/Images/General/dmg_0.png')
+  		self.OneHandedButton = self.comp.Button(self.Board, '', 'One-Handed', 190, 120, self.SetOneHand, 'm2kmod/Images/General/onehand_0.tga', 'm2kmod/Images/General/onehand_1.tga', 'm2kmod/Images/General/onehand_0.tga')
 		self.TwoHandedButton = self.comp.Button(self.Board, '', 'Two-Handed', 245, 120, self.SetTwoHand, 'm2kmod/Images/General/twohand_0.tga', 'm2kmod/Images/General/twohand_1.tga', 'm2kmod/Images/General/twohand_0.tga')
-		
+  
 		self.CloseButton = self.comp.Button(self.Board, '', 'Close', 270, 8, self.Hide_UI, 'd:/ymir work/ui/public/close_button_01.sub', 'd:/ymir work/ui/public/close_button_02.sub', 'd:/ymir work/ui/public/close_button_03.sub')
 		self.ReplaceIdButton = self.comp.Button(self.Board, 'Replace ID', '', 40, 330, self.ReplaceId, 'd:/ymir work/ui/public/large_button_01.sub', 'd:/ymir work/ui/public/large_button_02.sub','d:/ymir work/ui/public/large_button_03.sub')
 		self.BarItems, self.ListBoxItems, ScrollItems = self.comp.ListBoxEx2(self.Board, 25, 225, 100, 100)
@@ -113,6 +115,9 @@ class SettingsDialog(ui.ScriptWindow):
 
 	def SetTwoHand(self): 
 		chr.SetMotionMode(chr.MOTION_MODE_TWOHAND_SWORD)
+  
+	def OpenDmgMenu(self):
+		Dmg.OpenWindow()
 		
 	
 

@@ -11,6 +11,11 @@ import net_packet,sys
 CONFIG = net_packet.PATH + 'm2kmod/Saves/config.m2k'
 CONFIG_PRICE = net_packet.PATH + 'm2kmod/Saves/priceconfig.m2k'
 ATTACK_RANGE = 250
+METIN_TYPE = 2
+MONSTER_TYPE = 0
+PLAYER_TYPE = 6
+
+
 
 def ReadConfig(Setting):
 	f = open(CONFIG)
