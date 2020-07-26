@@ -10,7 +10,6 @@ class DmgHacks(ui.Window):
 		self.BuildWindow()
 
 	def __del__(self):
-		chat.AppendChat(3,"TEST1")
 		ui.Window.__del__(self)
 
 	def BuildWindow(self):
@@ -114,7 +113,7 @@ class DmgHacks(ui.Window):
 					return
 				if self.MetinButton.isOn and chr.GetInstanceType(vid) != m2k_lib.METIN_TYPE:
 					continue
-				if player.GetCharacterDistance(vid) < self.range:	
+				if player.GetCharacterDistance(vid) < self.range and not net_packet.isDead(vid):	
 					lst.append(vid)
 			hit_counter = 0
 			i = 0

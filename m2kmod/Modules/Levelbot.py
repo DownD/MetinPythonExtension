@@ -16,7 +16,7 @@ class LevelbotDialog(ui.ScriptWindow):
 	SkillCount = 0
 	SkillIndex = 0
 	DIST_TO_ATTACK = 280
-	MIN_SPEED = 200 
+	MIN_SPEED = 200
 	
 	def __init__(self):
 		ui.ScriptWindow.__init__(self)
@@ -66,10 +66,11 @@ class LevelbotDialog(ui.ScriptWindow):
 		self.PullButton = self.comp.OnOffButton(self.Board, '', 'Use Capes', 19, 110, self.SetPull,image="icon/item/70038.tga")
 		#self.PullOff = self.comp.HideButton(self.Board, '', 'Use Capes', 30, 120, self.SetPull, 'm2kmod/Images/off_0.tga', 'm2kmod/Images/off_1.tga', 'm2kmod/Images/off_2.tga')
 		self.MetinButton = self.comp.OnOffButton(self.Board, '', 'Attack metins', 35, 280, self.SetMetinAttack,image="m2kmod/Images/General/metin.png")
-		self.BossButton = self.comp.OnOffButton(self.Board, '', 'Attack bosses', 85, 280,image="m2kmod/Images/General/boss.png")
+		self.editTime ,self.TimeWaitMetinDead = self.comp.EditLine(self.Board, '1.2', 40, 320, 30, 14, 7)
+		self.clockImage = self.comp.ExpandedImage(self.Board, 20, 320, "m2kmod/Images/General/clock.png")
+  		self.BossButton = self.comp.OnOffButton(self.Board, '', 'Attack bosses', 85, 280,image="m2kmod/Images/General/boss.png")
 		self.MonsterButton = self.comp.OnOffButton(self.Board, '', 'Attack monsters', 135, 280,image="m2kmod/Images/General/monster.png")
-  
-  
+
 		self.LoadSettings()
 		
 		self.SlidbarRed.SetSliderPos(self.RedPercent*0.01)
@@ -107,6 +108,7 @@ class LevelbotDialog(ui.ScriptWindow):
 		self.AddSkillIcons()
 		self.LoadSkill()
 		self.LastAliveTime = 0
+		#self.TimeWaitMetinDead = 1.2
 
 		#Timers
 		self.pullLastTime = 0
@@ -115,6 +117,7 @@ class LevelbotDialog(ui.ScriptWindow):
 		self.restartPotsAndExp = 0
 		self.attackLastTime = 0
 		self.charStuckTrys = 0
+		self.metinDeadLastTime = 0
 
 	def __del__(self):
 		ui.ScriptWindow.__del__(self)
@@ -146,6 +149,7 @@ class LevelbotDialog(ui.ScriptWindow):
 		self.MetinButton.SetValue(int(m2k_lib.ReadConfig("Attack-Metin")))
 		self.BossButton.SetValue(int(m2k_lib.ReadConfig("Attack-Boss")))
 		self.MonsterButton.SetValue(int(m2k_lib.ReadConfig("Attack-Monster")))
+		self.TimeWaitMetinDead.SetText(m2k_lib.ReadConfig("TimeMetinDead"))
 
 	def Hide_UI(self):
 		m2k_lib.SaveConfig("RedPercent", str(self.RedPercent))
@@ -160,6 +164,7 @@ class LevelbotDialog(ui.ScriptWindow):
 		m2k_lib.SaveConfig("Attack-Metin", str(self.MetinButton.isOn))
 		m2k_lib.SaveConfig("Attack-Boss", str(self.BossButton.isOn))
 		m2k_lib.SaveConfig("Attack-Monster", str(self.MonsterButton.isOn))
+		m2k_lib.SaveConfig("TimeMetinDead", str(self.TimeWaitMetinDead.GetText()))
 	#	m2k_lib.SaveConfig("Red-Pot", str(self.RedPotID))
 	#	m2k_lib.SaveConfig("Blue-Pot", str(self.BluePotID))
 	#	m2k_lib.SaveConfig("AutoRed-Pot", str(self.RedAutoPotID))
@@ -453,7 +458,14 @@ class LevelbotDialog(ui.ScriptWindow):
 	def HandleAutoAttack(self):
 		val,self.attackLastTime = m2k_lib.timeSleep(self.attackLastTime,0.5)
 		if(val):
+			if self.MetinButton.isOn and self.metinDeadLastTime != 0 and self.metinDeadLastTime + float(self.TimeWaitMetinDead.GetText()) < m2k_lib.GetTime():
+				return
+			self.metinDeadLastTime = 0
 			if(chr.HasInstance(self.Target)):
+				if(net_packet.IsDead(self.Target)):
+					self.metinDeadLastTime = m2k_lib.GetTime()
+					self.Target = -1
+					return
 				self.AttackTarget()
 			else:
 				target = -1
@@ -618,9 +630,9 @@ def getClosestInstance(_type,is_unblocked=True):
 			if net_packet.IsPositionBlocked(mob_x,mob_y):
 				continue
 		this_distance = player.GetCharacterDistance(vid)
-		type = chr.GetInstanceType(vid)
-		if vid == None:
+		if net_packet.IsDead(vid):
 			continue
+		type = chr.GetInstanceType(vid)
 		if type == _type:
 			if isPlayerCloseToInstance(vid):
 				continue

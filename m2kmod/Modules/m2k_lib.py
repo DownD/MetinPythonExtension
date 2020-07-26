@@ -329,13 +329,14 @@ class Component:
 		Slider.SetEvent(func)
 		return Slider
 
-	def ExpandedImage(self, parent, x, y, img):
+	def ExpandedImage(self, parent, x, y, img, tooltip=None):
 		image = ui.ExpandedImageBox()
 		if parent != None:
 			image.SetParent(parent)
 		image.SetPosition(x, y)
 		image.LoadImage(img)
 		image.Show()
+		#image.SetToolTipText(tooltip)
 		return image
 		
 	def ComboBoxFunc(self, parent, text, x, y, width, func):

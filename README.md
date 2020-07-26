@@ -11,3 +11,4 @@ Bot to be used with my c++ python library.
 ### V0.3
 - Implemented WaitHack
 - Removed some usseless or bugged modules
+- Change level bot to make use of IsDead function
