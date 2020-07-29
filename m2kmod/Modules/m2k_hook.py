@@ -16,6 +16,7 @@ def HookedQuestWindow(data):
 	pass
 	
 
+CURRENT_PHASE = 0
 	
 	
 def PartyButton(self):
@@ -77,6 +78,23 @@ def PartyButton(self):
 		
 detour_questwindow = DetourFunction(game.GameWindow.OpenQuestWindow, HookedQuestWindow)
 
+origSetPhaseWindow = net.SetPhaseWindow
+
+
+#Phase Hook
+def phaseHook(num,obj):
+    global CURRENT_PHASE
+    CURRENT_PHASE = num
+    return origSetPhaseWindow(num,obj)
+    
+    
+def hookSetPhaseWindow():
+    net.SetPhaseWindow = phaseHook
+    
+def unhookSetPhaseWindow():
+    net.SetPhaseWindow = origSetPhaseWindow
+    
+    
 def SetComboHook():
 	ui.ComboBox.GetCurrentText = GetCurrentText
 	ui.ComboBox.GetSelectedIndex = GetSelectedIndex

@@ -105,8 +105,8 @@ class LevelbotDialog(ui.ScriptWindow):
 		else:
 			self.BuffBotStartButton.Show()
 		
-		self.AddSkillIcons()
-		self.LoadSkill()
+		#self.AddSkillIcons()
+		#self.LoadSkill()
 		self.LastAliveTime = 0
 		#self.TimeWaitMetinDead = 1.2
 
@@ -469,12 +469,13 @@ class LevelbotDialog(ui.ScriptWindow):
 				self.AttackTarget()
 			else:
 				target = -1
-				if(self.MetinButton.isOn):
-					target = getClosestInstance(m2k_lib.METIN_TYPE)
-
-			#if(self.BossButton.isOn):
+				if(self.BossButton.isOn):
+					target = m2k_lib.getClosestInstance(m2k_lib.BOSS_TYPE)
+				if(self.MetinButton.isOn and target == -1):
+					target = m2k_lib.getClosestInstance(m2k_lib.METIN_TYPE)
 				if(self.MonsterButton.isOn and target == -1):
-					target = getClosestInstance(m2k_lib.MONSTER_TYPE)
+					target = m2k_lib.getClosestInstance(m2k_lib.MONSTER_TYPE)
+
 				#chat.AppendChat(3,"Target = "+ str(chr.GetNameByVID(self.Target)))
 				self.Target = target
 				if self.Pick:
@@ -606,40 +607,5 @@ def UseItem(id):
 			net.SendItemUsePacket(i)
 			break
 
-def isPlayerCloseToInstance(vid_target):
-	my_vid = net.GetMainActorVID()
-	target_x,target_y,zz = chr.GetPixelPosition(vid_target) 
-	for vid in net_packet.InstancesList:
-		if not chr.HasInstance(vid):
-			continue
-		if chr.GetInstanceType(vid) == m2k_lib.PLAYER_TYPE and vid != my_vid:
-			curr_x,curr_y,z = chr.GetPixelPosition(vid)
-			distance = dist(target_x,target_y,curr_x,curr_y)
-			if(distance < 300):
-				return True
-	
-	return False
-		
-def getClosestInstance(_type,is_unblocked=True):
-	(closest_vid,dist) = (-1,999999999)
-	for vid in net_packet.InstancesList:
-		if not chr.HasInstance(vid):
-			continue
-		if is_unblocked:
-			mob_x,mob_y,mob_z = chr.GetPixelPosition(vid)
-			if net_packet.IsPositionBlocked(mob_x,mob_y):
-				continue
-		this_distance = player.GetCharacterDistance(vid)
-		if net_packet.IsDead(vid):
-			continue
-		type = chr.GetInstanceType(vid)
-		if type == _type:
-			if isPlayerCloseToInstance(vid):
-				continue
-			if this_distance < dist:
-				dist = this_distance
-				closest_vid = vid
-	
-	return closest_vid
 
 #LevelbotDialog().Show()

@@ -20,3 +20,4 @@ sys.modules['uiminimap'] = _uiminimap
 
 setattr(_player, 'GetName', _player.GetChrName)
 setattr(_player, 'ClickSkillSlot', _player.UseSkillSlot)
+setattr(_net, 'GetServerInfo', _net.GetServerInfoGame)

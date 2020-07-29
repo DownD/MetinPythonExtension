@@ -113,7 +113,7 @@ class DmgHacks(ui.Window):
 					return
 				if self.MetinButton.isOn and chr.GetInstanceType(vid) != m2k_lib.METIN_TYPE:
 					continue
-				if player.GetCharacterDistance(vid) < self.range and not net_packet.isDead(vid):	
+				if player.GetCharacterDistance(vid) < self.range and not net_packet.IsDead(vid):	
 					lst.append(vid)
 			hit_counter = 0
 			i = 0

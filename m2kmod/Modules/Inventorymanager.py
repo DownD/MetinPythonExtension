@@ -119,7 +119,7 @@ class InventoryDialog(ui.ScriptWindow):
 		if ItemIndex:
 			pass
 		else:
-			chat.AppendChat(7, "[m2k-Mod] No selctd Items!")
+			chat.AppendChat(7, "[m2k-Mod] No selcted Items!")
 			return
 		SelectedItem = ItemIndex.GetText().split("    ")	
 		net.SendShopSellPacket(int(SelectedItem[0]))

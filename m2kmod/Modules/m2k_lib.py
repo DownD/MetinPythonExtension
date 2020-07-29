@@ -6,15 +6,22 @@ import net
 import player
 import item
 import background,constInfo,wndMgr,math,uiCommon,grp,dbg,snd
-import net_packet,sys
+import net_packet,sys,chr,uiToolTip,m2k_hook
 #import pack
 CONFIG = net_packet.PATH + 'm2kmod/Saves/config.m2k'
 CONFIG_PRICE = net_packet.PATH + 'm2kmod/Saves/priceconfig.m2k'
-ATTACK_RANGE = 250
+CONFIG_BOSSES_ID = net_packet.PATH + 'm2kmod/Saves/boss_ids.txt'
+
+ATTACK_RANGE = 270
+
 METIN_TYPE = 2
 MONSTER_TYPE = 0
 PLAYER_TYPE = 6
+BOSS_TYPE = -1
 
+BOSS_IDS = dict()
+
+MAX_INVENOTRY_SIZE = 100
 
 
 def ReadConfig(Setting):
@@ -30,8 +37,24 @@ def ReadConfig(Setting):
 		search.write(Setting + "=0\n")
 		return 0
 
-
-
+def LoadBossList():
+	with open(CONFIG_BOSSES_ID,'r') as f:
+		for line in f:
+			line = line.rstrip()
+			lst = line.split('=')
+			BOSS_IDS[int(lst[1])] = lst[0]
+   
+def SaveBossList():
+    with open(CONFIG_BOSSES_ID,'w') as f:
+        for id in BOSS_IDS:
+            f.write(BOSS_IDS[id] + "=" + str(id)+"\n")
+            
+def isBoss(vnum):
+    if chr.GetVirtualNumber(vnum) in BOSS_IDS:
+        return True
+    else:
+        return False
+        
 def SaveConfig(Setting, Value):
 	sReader = open(CONFIG, 'r')
 	sLines = file.readlines(sReader)
@@ -130,13 +153,71 @@ def RotateMainCharacter(x,y):
     rot = GetRotation(my_x,my_y,x,y)
     chr.SetRotation(rot)
     
+    
+def GetCurrentPhase():
+    return m2k_hook.CURRENT_PHASE
 
+def isPlayerCloseToInstance(vid_target):
+	my_vid = net.GetMainActorVID()
+	target_x,target_y,zz = chr.GetPixelPosition(vid_target) 
+	for vid in net_packet.InstancesList:
+		if not chr.HasInstance(vid):
+			continue
+		if chr.GetInstanceType(vid) == PLAYER_TYPE and vid != my_vid:
+			curr_x,curr_y,z = chr.GetPixelPosition(vid)
+			distance = dist(target_x,target_y,curr_x,curr_y)
+			if(distance < 300):
+				return True
+	
+	return False
+		
+def getClosestInstance(_type,is_unblocked=True):
+	(closest_vid,_dist) = (-1,999999999)
+	for vid in net_packet.InstancesList:
+		if not chr.HasInstance(vid):
+			continue
+		if is_unblocked:
+			mob_x,mob_y,mob_z = chr.GetPixelPosition(vid)
+			if net_packet.IsPositionBlocked(mob_x,mob_y):
+				continue
+		this_distance = player.GetCharacterDistance(vid)
+		if net_packet.IsDead(vid):
+			continue
+
+		type = chr.GetInstanceType(vid)
+		if type == _type or (_type == BOSS_TYPE and isBoss(vid)):
+			if this_distance < _dist and not isPlayerCloseToInstance(vid):
+				_dist = this_distance
+				closest_vid = vid
+	
+	return closest_vid
+    
+MOVING_TO_TARGET = 1
+ATTACKING_TARGET = 0
+TARGET_IS_DEAD = -1
+
+#Retuns -1 of is dead, 0 if attacking target or 1 if moving to target
+def AttackTarget(vid):
+    if net_packet.IsDead(vid):
+        return TARGET_IS_DEAD
+    mob_x,mob_y,mob_z = chr.GetPixelPosition(vid)
+    if player.GetCharacterDistance(vid) < ATTACK_RANGE:
+        Movement.StopMovement()
+        RotateMainCharacter(mob_x,mob_y)
+        player.SetAttackKeyState(True)
+        return ATTACKING_TARGET
+    else:
+        player.SetAttackKeyState(False)
+        Movement.GoToPositionAvoidingObjects(mob_x,mob_y)
+        return MOVING_TO_TARGET
+        
 
 #Extracts an encrypted eter pakcet to Extractor folder inside the client
 def extractFile(path):
     import os
     initial_folder = "Extractor\\"
     file_location = initial_folder + path
+    file_location = file_location.replace(":","")
     _str = net_packet.Get(path)
     
     if not os.path.exists(os.path.dirname(file_location)):
@@ -209,11 +290,38 @@ class OnOffButton(ui.Button):
 		self.SetOverVisual(self.OffOverVisual)
 		self.SetDownVisual(self.OffDownVisual)
 		self.isOn = 0
+	def __del__(self):
+		self.Hide()
+		if self.image != None:
+			self.image.Hide()
+			self.image.__del__()
+		ui.Button.__del__(self)
 	
-    
-    
+class SlotWithToolTip(ui.SlotWindow):
+	def __init__(self,x,y,vnum,count,slotIndex,parent):
+		slot = ui.SlotWindow.__init__(self)
+		slot.SetParent(parent)
+		slot.SetSize(32, 32)
+		slot.SetSlotBaseImage("d:/ymir work/ui/public/Slot_Base.sub", 1.0, 1.0, 1.0, 1.0)
+		slot.AppendSlot(slotIndex, 0, 0, 32, 32)
+		slot.SetOverInItemEvent(ui.__mem_func__(self.OverInItem))
+		slot.SetOverOutItemEvent(ui.__mem_func__(self.OverOutItem))
+		slot.SetPosition(x, y)
+		slot.SetItemSlot(slotIndex, vnum, count)
+		slot.RefreshSlot()
+		self.tooltipItem = uiToolTip.ItemToolTip()
+		slot.Show()
+
+	def OverInItem(self,slotIndex):
+		self.tooltipItem.ClearToolTip()
+		self.tooltipItem.SetInventoryItem(slotIndex)
+		self.tooltipItem.ShowToolTip()
+
+	def OverOutItem(self):
+		self.tooltipItem.HideToolTip()
 		
 class Component:
+
 	def Button(self, parent, buttonName, tooltipText, x, y, func, UpVisual, OverVisual, DownVisual):
 		button = ui.Button()
 		if parent != None:
@@ -457,6 +565,8 @@ class Component:
 		ListBox.Show()
 		return bar, ListBox
 
+
+
 #Get current time in seconds
 def GetTime():
     return time.clock()
@@ -486,6 +596,15 @@ def extractFile(path):
 
 def dist(x1,y1,x2,y2):
 	return math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
+
+def GetCurrentChannel():
+	try:
+		return int(net.GetServerInfo().split(',')[1][3:])
+	except:
+		return 0
+
+def ChangeChannel(val):
+    net.SendChatPacket('/ch ' + str(val))
 
 class WaitingDialog(ui.ScriptWindow):
 
@@ -718,3 +837,8 @@ class SkillButton(ui.Window):
 			
 	def IsDown(self):
 		return wndMgr.IsDown(self.hWnd)
+
+
+LoadBossList()
+m2k_hook.hookSetPhaseWindow()
+import Movement
