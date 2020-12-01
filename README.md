@@ -12,3 +12,6 @@ Bot to be used with my c++ python library.
 - Implemented WaitHack
 - Removed some usseless or bugged modules
 - Change level bot to make use of IsDead function
+
+### V0.4
+- Implemented pathfinding algorithm, for the character to follow a path
