@@ -2,7 +2,7 @@ import ui,app,chat,chr,net,player,item,skill,time,game,shop,chrmgr
 import background,constInfo,miniMap,wndMgr,math,uiCommon,grp
 
 
-from m2kmod.Modules import Telehack, PythonManager, m2k_lib, m2k_hook, Settings, Levelbot, Buffbot, Spambot, Bookreader, Soulstonereader, Shopcreator, Itemstealer, Inventorymanager, Info, Itemcreator, EQChanger, Taubuyer
+from m2kmod.Modules import Filter,Telehack, PythonManager, m2k_lib, m2k_hook, Settings, Levelbot, Buffbot, Spambot, Bookreader, Soulstonereader, Shopcreator, Itemstealer, Inventorymanager, Info, Itemcreator, EQChanger, Taubuyer
 #import m2kmod_script
 
 class M2kHackbarDialog(ui.ScriptWindow): 				
@@ -16,6 +16,7 @@ class M2kHackbarDialog(ui.ScriptWindow):
 	levl = Levelbot.LevelbotDialog()
 	buff = Buffbot.BuffDialog()
 	spam = Spambot.SpamDialog()
+	filter = Filter.FilterDialog()
 	
 	book = Bookreader.BookReaderDialog()
 	soul = Soulstonereader.SoulStoneBotDialog()
@@ -62,7 +63,7 @@ class M2kHackbarDialog(ui.ScriptWindow):
 		self.LevelbotButton = self.comp.Button(self.m2kBoard, '', 'Levelbot', 8, 43, self.Levelbot, 'm2kmod/Images/Hackbar/sword_0.tga', 'm2kmod/Images/Hackbar/sword_1.tga', 'm2kmod/Images/Hackbar/sword_0.tga')
 		self.BuffbotButton = self.comp.Button(self.m2kBoard, '', 'Buffbot', 8, 78, self.BuffBot, 'm2kmod/Images/Hackbar/buff_0.tga', 'm2kmod/Images/Hackbar/buff_1.tga', 'm2kmod/Images/Hackbar/buff_0.tga')
 		self.SpambotButton = self.comp.Button(self.m2kBoard, '', 'Spambot', 8, 113, self.Spambot, 'm2kmod/Images/Hackbar/spam_0.tga', 'm2kmod/Images/Hackbar/spam_1.tga', 'm2kmod/Images/Hackbar/spam_0.tga')
-	#	self.SwichbotButton = self.comp.Button(self.m2kBoard, '', 'Swichbot', 8, 148, self.Swichbot, 'm2kmod/Images/Hackbar/swich_0.tga', 'm2kmod/Images/Hackbar/swich_1.tga', 'm2kmod/Images/Hackbar/swich_0.tga')
+		#self.SwichbotButton = self.comp.Button(self.m2kBoard, '', 'Packet Analyzer', 8, 148, self.PacketAnalyzer, 'm2kmod/Images/Hackbar/swich_0.tga', 'm2kmod/Images/Hackbar/swich_1.tga', 'm2kmod/Images/Hackbar/swich_0.tga')
 		self.FBButton = self.comp.Button(self.m2kBoard, '', 'BookReader', 8, 183, self.BookReader, 'm2kmod/Images/Hackbar/fb_0.tga', 'm2kmod/Images/Hackbar/fb_1.tga', 'm2kmod/Images/Hackbar/fb_0.tga')
 		self.SeliButton = self.comp.Button(self.m2kBoard, '', 'SoulReader', 8, 218, self.SoulstoneReader, 'm2kmod/Images/Hackbar/seli_0.tga', 'm2kmod/Images/Hackbar/seli_1.tga', 'm2kmod/Images/Hackbar/seli_0.tga')
 		self.BuyTauButton = self.comp.Button(self.m2kBoard, '', 'Tau-Buyer', 8, 253, self.BuyTau, 'm2kmod/Images/Hackbar/tau_0.tga', 'm2kmod/Images/Hackbar/tau_1.tga', 'm2kmod/Images/Hackbar/tau_0.tga')
@@ -73,7 +74,8 @@ class M2kHackbarDialog(ui.ScriptWindow):
 		self.ItemCreatorButton = self.comp.Button(self.m2kBoard, '', 'ItemCreator', 8, 428, self.ItemCreator, 'm2kmod/Images/Hackbar/itemc_0.tga', 'm2kmod/Images/Hackbar/itemc_1.tga', 'm2kmod/Images/Hackbar/itemc_0.tga')
 		self.EQChangerButton = self.comp.Button(self.m2kBoard, '', 'EQ-Changer', 8, 463, self.EQChanger, 'm2kmod/Images/Hackbar/eqchanger_0.tga', 'm2kmod/Images/Hackbar/eqchanger_1.tga', 'm2kmod/Images/Hackbar/eqchanger_0.tga')
 		self.RunPythonButton = self.comp.Button(self.m2kBoard, '', 'Run-Python', 10, 500, self.RunPython, 'm2kmod/Images/Shortcuts/loadpy_0.tga', 'm2kmod/Images/Shortcuts/loadpy_1.tga', 'm2kmod/Images/Shortcuts/loadpy_0.tga')
- 	#	self.AlchemistBotButton = self.comp.Button(self.m2kBoard, '', 'Alchemist', 10, 500, self.Alchemist, 'm2kmod/Images/Hackbar/energy_0.tga', 'm2kmod/Images/Hackbar/energy_1.tga', 'm2kmod/Images/Hackbar/energy_0.tga')
+		self.AnalyzerButton = self.comp.Button(self.m2kBoard, '', 'Packet Analyzer', 8, 148, self.PacketAnalyzer, 'm2kmod/Images/Hackbar/analyzer_0.tga', 'm2kmod/Images/Hackbar/analyzer_1.tga', 'm2kmod/Images/Hackbar/analyzer_0.tga')
+	 #	self.AlchemistBotButton = self.comp.Button(self.m2kBoard, '', 'Alchemist', 10, 500, self.Alchemist, 'm2kmod/Images/Hackbar/energy_0.tga', 'm2kmod/Images/Hackbar/energy_1.tga', 'm2kmod/Images/Hackbar/energy_0.tga')
 		#self.InfoButton = self.comp.Button(self.m2kBoard, '', 'Info', 10, 500, self.Info, 'm2kmod/Images/Hackbar/info_0.tga', 'm2kmod/Images/Hackbar/info_1.tga', 'm2kmod/Images/Hackbar/info_0.tga')
 		self.CopyrightLabel = self.comp.TextLine(self.m2kBoard, '(c)123klo', 7, 540, self.comp.RGB(255, 255, 0))
 	def OpenHackbar(self):
@@ -140,7 +142,8 @@ class M2kHackbarDialog(ui.ScriptWindow):
 		self.buff.switch_state()
 	def Spambot(self):	
 		self.spam.switch_state()
-	def Swichbot(self):
+	def PacketAnalyzer(self):
+		self.filter.switch_state()
 		return
 		#self.swch.switch_state()
 	def BookReader(self):

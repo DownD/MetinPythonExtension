@@ -5,19 +5,24 @@
 #import m2kmod.Modules.EQChanger,m2kmod.Modules.Info,m2kmod.Modules.Shopcreator,m2kmod.Modules.Mobscanner,m2kmod.Modules.CHChanger,m2kmod.Modules.Telehack
 
 import sys
-import a70273956fae196f1954b9fb6066a39df as _player
-import e120e808bbd36072fe6d48de1d0c4287e as _net
-import yWp8YWaB4m5N2glpnses as _app
-import zsDuxBCwljHyuNKnD6Fh as _item
-import ui12zi as _uiminimap
+import chatm2g as _chat
+import playerm2g2 as _player
+import m2netm2g as _net
+import chrmgrm2g as _chrmgr
+import net_packet
+#import yWp8YWaB4m5N2glpnses as _app
+#import zsDuxBCwljHyuNKnD6Fh as _item
+#import ui12zi as _uiminimap
 
 sys.modules['player'] = _player
 sys.modules['net'] = _net
-sys.modules['app'] = _app
-sys.modules['item'] = _item
-sys.modules['uiminimap'] = _uiminimap
+#sys.modules['app'] = _app
+#sys.modules['item'] = _item
+#sys.modules['uiminimap'] = _uiminimap
+sys.modules['chat'] = _chat
+sys.modules['chrmgr'] = _chrmgr
 
-
-setattr(_player, 'GetName', _player.GetChrName)
-setattr(_player, 'ClickSkillSlot', _player.UseSkillSlot)
-setattr(_net, 'GetServerInfo', _net.GetServerInfoGame)
+setattr(_chrmgr, 'GetPixelPosition', net_packet.GetPixelPosition)
+#setattr(_player, 'GetName', _player.GetChrName)
+#setattr(_player, 'ClickSkillSlot', _player.UseSkillSlot)
+#setattr(_net, 'GetServerInfo', _net.GetServerInfoGame)

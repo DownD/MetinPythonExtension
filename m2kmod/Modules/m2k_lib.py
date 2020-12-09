@@ -251,7 +251,7 @@ class ByteMatrix:
         self.buffer[self.max_x*y + x] = value
 
 class OnOffButton(ui.Button):
-	def __init__(self,OffUpVisual, OffOverVisual, OffDownVisual,OnUpVisual, OnOverVisual, OnDownVisual, image=None,func=None):
+	def __init__(self,OffUpVisual, OffOverVisual, OffDownVisual,OnUpVisual, OnOverVisual, OnDownVisual, image=None,func=None,tooltip=None):
 		ui.Button.__init__(self)
 		self.OffUpVisual = OffUpVisual
 		self.OffOverVisual = OffOverVisual 
@@ -346,7 +346,7 @@ class Component:
 		if parent != None:
 			button.SetParent(parent)
 		button.SetPosition(x, y)
-		button.SetText(buttonName)
+		button.SetText("                "+ str(buttonName))
 		button.SetToolTipText(tooltipText)
 		#button.SetEvent(func)
 		button.Show()

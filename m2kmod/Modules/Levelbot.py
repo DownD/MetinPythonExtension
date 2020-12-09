@@ -65,11 +65,11 @@ class LevelbotDialog(ui.ScriptWindow):
 		#self.PullOff = self.comp.HideButton(self.Board, '', 'Use Capes', 30, 120, self.SetPull, 'm2kmod/Images/off_0.tga', 'm2kmod/Images/off_1.tga', 'm2kmod/Images/off_2.tga')
 		self.PullButton = self.comp.OnOffButton(self.Board, '', 'Use Capes', 19, 110, self.SetPull,image="icon/item/70038.tga")
 		#self.PullOff = self.comp.HideButton(self.Board, '', 'Use Capes', 30, 120, self.SetPull, 'm2kmod/Images/off_0.tga', 'm2kmod/Images/off_1.tga', 'm2kmod/Images/off_2.tga')
-		self.MetinButton = self.comp.OnOffButton(self.Board, '', 'Attack metins', 35, 280, self.SetMetinAttack,image="m2kmod/Images/General/metin.png")
+		self.MetinButton = self.comp.OnOffButton(self.Board, '', 'Attack metins', 35, 280, self.SetMetinAttack,image="m2kmod/Images/General/metin.tga")
 		self.editTime ,self.TimeWaitMetinDead = self.comp.EditLine(self.Board, '1.2', 40, 320, 30, 14, 7)
-		self.clockImage = self.comp.ExpandedImage(self.Board, 20, 320, "m2kmod/Images/General/clock.png")
-  		self.BossButton = self.comp.OnOffButton(self.Board, '', 'Attack bosses', 85, 280,image="m2kmod/Images/General/boss.png")
-		self.MonsterButton = self.comp.OnOffButton(self.Board, '', 'Attack monsters', 135, 280,image="m2kmod/Images/General/monster.png")
+		self.clockImage = self.comp.ExpandedImage(self.Board, 20, 320, "m2kmod/Images/General/clock.tga")
+  		self.BossButton = self.comp.OnOffButton(self.Board, '', 'Attack bosses', 85, 280,image="m2kmod/Images/General/boss.tga")
+		self.MonsterButton = self.comp.OnOffButton(self.Board, '', 'Attack monsters', 135, 280,image="m2kmod/Images/General/monster.tga")
 
 		self.LoadSettings()
 		

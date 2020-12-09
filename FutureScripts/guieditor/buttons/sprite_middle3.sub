@@ -1,0 +1,7 @@
+title subImage
+version 2.0
+image "sprite_middle.tga"
+left 0
+top 36
+right 58
+bottom 54

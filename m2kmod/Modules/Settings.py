@@ -29,7 +29,7 @@ class SettingsDialog(ui.ScriptWindow):
 		self.MoveSpeedButton = self.comp.Button(self.Board, '', 'Move-Speed', 25, 70, self.SetMoveSpeed, 'm2kmod/Images/Shortcuts/move_0.tga', 'm2kmod/Images/Shortcuts/move_1.tga', 'm2kmod/Images/Shortcuts/move_0.tga')
 		self.DayButton = self.comp.Button(self.Board, '', 'Day', 25, 120, self.SetDay, 'm2kmod/Images/General/sun_0.tga', 'm2kmod/Images/General/sun_1.tga', 'm2kmod/Images/General/sun_0.tga')
 		self.NightButton = self.comp.Button(self.Board, '', 'Night', 80, 120, self.SetNight, 'm2kmod/Images/General/moon_0.tga', 'm2kmod/Images/General/moon_1.tga', 'm2kmod/Images/General/moon_0.tga')
-		self.DmgMenuButton = self.comp.Button(self.Board, '', 'Damage Hacks', 133, 120, self.OpenDmgMenu, 'm2kmod/Images/General/dmg_0.png', 'm2kmod/Images/General/dmg_1.png', 'm2kmod/Images/General/dmg_0.png')
+		self.DmgMenuButton = self.comp.Button(self.Board, '', 'Damage Hacks', 133, 120, self.OpenDmgMenu,  'm2kmod/Images/General/dmg_0.tga', 'm2kmod/Images/General/dmg_1.tga', 'm2kmod/Images/General/dmg_0.tga')
   		self.OneHandedButton = self.comp.Button(self.Board, '', 'One-Handed', 190, 120, self.SetOneHand, 'm2kmod/Images/General/onehand_0.tga', 'm2kmod/Images/General/onehand_1.tga', 'm2kmod/Images/General/onehand_0.tga')
 		self.TwoHandedButton = self.comp.Button(self.Board, '', 'Two-Handed', 245, 120, self.SetTwoHand, 'm2kmod/Images/General/twohand_0.tga', 'm2kmod/Images/General/twohand_1.tga', 'm2kmod/Images/General/twohand_0.tga')
   

@@ -24,7 +24,7 @@ class DmgHacks(ui.Window):
 		self.comp = m2k_lib.Component()
 
 		self.enableButton = self.comp.OnOffButton(self.Board, '', '', 130, 200, OffUpVisual='m2kmod/Images/start_0.tga', OffOverVisual='m2kmod/Images/start_1.tga', OffDownVisual='m2kmod/Images/start_2.tga',OnUpVisual='m2kmod/Images/stop_0.tga', OnOverVisual='m2kmod/Images/stop_1.tga', OnDownVisual='m2kmod/Images/stop_2.tga' )
-		self.MetinButton = self.comp.OnOffButton(self.Board, '', 'Only attack metins', 220, 40,image="m2kmod/Images/General/metin.png")
+		self.MetinButton = self.comp.OnOffButton(self.Board, '', 'Only attack metins', 220, 40,image="m2kmod/Images/General/metin.tga")
   		self.playerClose = self.comp.OnOffButton(self.Board, '', '', 130, 50)
 		self.RangeLabel = self.comp.TextLine(self.Board, 'Range', 13, 92, self.comp.RGB(255, 255, 255))
 		self.SpeedLabel = self.comp.TextLine(self.Board, 'Speed', 13, 126, self.comp.RGB(255, 255, 255))
