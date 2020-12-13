@@ -56,7 +56,6 @@ class FilterDialog(ui.Window):
 
 	def inboundMode(self):
 		if(self.inboundModeBtn.isOn):
-			chat.AppendChat(3,str(0))
 			self.inboundModeBtn.SetOff()
 			net_packet.SetInFilterMode(0)
 		else:

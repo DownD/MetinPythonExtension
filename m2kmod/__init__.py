@@ -10,6 +10,7 @@ import playerm2g2 as _player
 import m2netm2g as _net
 import chrmgrm2g as _chrmgr
 import net_packet
+import chr
 #import yWp8YWaB4m5N2glpnses as _app
 #import zsDuxBCwljHyuNKnD6Fh as _item
 #import ui12zi as _uiminimap
@@ -22,7 +23,9 @@ sys.modules['net'] = _net
 sys.modules['chat'] = _chat
 sys.modules['chrmgr'] = _chrmgr
 
-setattr(_chrmgr, 'GetPixelPosition', net_packet.GetPixelPosition)
+setattr(chr, 'GetPixelPosition', net_packet.GetPixelPosition)
+setattr(chr, 'MoveToDestPosition', net_packet.MoveToDestPosition)
+setattr(_net, 'GetMainActorVID', _player.GetMainCharacterIndex)
 #setattr(_player, 'GetName', _player.GetChrName)
 #setattr(_player, 'ClickSkillSlot', _player.UseSkillSlot)
 #setattr(_net, 'GetServerInfo', _net.GetServerInfoGame)
