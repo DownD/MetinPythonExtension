@@ -15,6 +15,8 @@ Bot to be used with my c++ python library.
 - Teleport hack
 - Packet Filter
 
+### Preview
+![image info](https://i.gyazo.com/25b54da88d8b8696f03b7e0cec5d76f7.jpg)
 ## Notes
 - init.py needs to be changed in case the server changes critical modules or functions
 
