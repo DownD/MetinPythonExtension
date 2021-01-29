@@ -1,53 +1,46 @@
 _chr = chr
-import ui,chr,skill,time,game,shop,chrmgr
-import app
-import chat
-import net
-import player
-import item
-import background,constInfo,wndMgr,math,uiCommon,grp,dbg,snd
-import net_packet,sys,chr,uiToolTip,m2k_hook
+from m2kmod.Modules.Hooks import Hook
+import Hooks
+import ui,chr,time,app, net, player,wndMgr,math,snd,net_packet,uiToolTip,item,FileManager,event,chat
+from datetime import datetime
 #import pack
+
 CONFIG = net_packet.PATH + 'm2kmod/Saves/config.m2k'
 CONFIG_PRICE = net_packet.PATH + 'm2kmod/Saves/priceconfig.m2k'
 CONFIG_BOSSES_ID = net_packet.PATH + 'm2kmod/Saves/boss_ids.txt'
+CONFIG_PSHOP_AUTO_BUY = net_packet.PATH + 'm2kmod/Saves/search_items_max_price.txt'
+CONFIG_SHOP_CREATOR = net_packet.PATH + 'm2kmod/Saves/item_sell_prices.txt'
+SHOP_CREATOR_LOG = net_packet.PATH + 'm2kmod/Saves/shop_log.txt'
 
 ATTACK_RANGE = 270
 
+#Types
 METIN_TYPE = 2
 MONSTER_TYPE = 0
 PLAYER_TYPE = 6
 BOSS_TYPE = -1
 
 BOSS_IDS = dict()
+#SEARCH_ITEMS_MAX_PRICE = dict()
 
-MAX_INVENOTRY_SIZE = 100
+MAX_INVENTORY_SIZE = 90
+MAX_TELEPORT_DIST = 2400
+
+MIN_RACE_SHOP = 30000
+MAX_RACE_SHOP = 30008
+
+PHASE_GAME = 5
 
 
-def ReadConfig(Setting):
-	f = open(CONFIG)
-	#sys.stderr.write(CONFIG)
-	
-	
-	with open(CONFIG,'a+') as search:
-		for line in search:
-			line = line.rstrip()  # remove '\n' at end of line
-			if line.startswith(Setting):
-				return line.split('=')[1]
-		search.write(Setting + "=0\n")
-		return 0
+#Minumum number of empty slots for the inventory to be considered full
+INV_FULL_MIN_EMPTY = 10
+MAX_ITEM_COUNT = 200
 
-def LoadBossList():
-	with open(CONFIG_BOSSES_ID,'r') as f:
-		for line in f:
-			line = line.rstrip()
-			lst = line.split('=')
-			BOSS_IDS[int(lst[1])] = lst[0]
-   
-def SaveBossList():
-    with open(CONFIG_BOSSES_ID,'w') as f:
-        for id in BOSS_IDS:
-            f.write(BOSS_IDS[id] + "=" + str(id)+"\n")
+#Maximum distance to pickup before telport
+MAX_PICKUP_DIST = 290
+
+
+
             
 def isBoss(vnum):
     if chr.GetVirtualNumber(vnum) in BOSS_IDS:
@@ -55,26 +48,8 @@ def isBoss(vnum):
     else:
         return False
         
-def SaveConfig(Setting, Value):
-	sReader = open(CONFIG, 'r')
-	sLines = file.readlines(sReader)
-	sWriter = open(CONFIG, 'w')
-	for Line in sLines:
-		if Line.startswith(Setting + '='):
-			Line = Setting + '=' + Value + '\n'
-		sWriter.write(Line)
-	sReader.close()
-	sWriter.close()
 
-def ReadAllElements(name,object):
-    for attr in object.__dict__:
-        if attr is int or attr is str:
-            object.__dict__[attr] = ReadConfig(name + "." + str(attr))
-
-def SaveAllElements(name,object):
-    for attr in object.__dict__:
-        if attr is int or attr is str:
-            SaveConfig(name + "." + str(attr),object.__dict__[attr])
+#def Debug(self,*args):
 		
 def CreateLogininfo(id,pw,name,slot,ch,autologin):
 	os.remove("logininfo.xml")
@@ -85,7 +60,37 @@ def CreateLogininfo(id,pw,name,slot,ch,autologin):
 	f.write('<slot>'+slot+'</slot>\n')
 	f.write('<auto_login>'+autologin+'</auto_login>\n')
 	f.write('</logininfo>\n')
-	f.close()		
+	f.close()
+
+
+def DebugPrint(arg):
+	with open("Log.txt","a") as f:
+		f.write(str(datetime.now())+": "+arg+"\n")
+
+
+def Revive():
+	net.SendCommandPacket(5,1)
+
+#Given the price in "kk" the function will return the price in wons and yang
+#Example:
+# "435kk" -> 4, 35000000 
+def ConvertPrice(price_str,item_num=1):
+	multiplier = price_str.count("k")	
+	yang = float(price_str.replace("k",""))
+	yang *= 1000**multiplier
+	yang  *= item_num
+	#yang = int(yang)
+	#chat.AppendChat(3,str(yang))
+
+	wons = int(yang/100000000)
+	if(wons > 0):
+		rest_yang = int(yang % (wons*100000000))
+	else:
+		rest_yang = int(yang)
+
+	return (wons,rest_yang)
+
+
 	
 def GetClass():
 	race = net.GetMainActorRace()
@@ -106,17 +111,18 @@ def NewSkillsEnable():
 		return 6
 	else:
 		return 5
-		
-def imp_or_reload(name):
-	import sys
-	if name in sys.modules:
-		return reload(sys.modules[name])
-	return __import__(name)
+
+#Skip python select answers
+def skipAnswers(event_answers,hook=False):
+	if hook:
+		Hook.questHook.HookFunction()
+	for index,answer in enumerate(event_answers,start=1):
+		event.SelectAnswer(index,answer)
 
 		
 def GetCurrentText(self):
 	return self.textLine.GetText()
-	
+
 def OnSelectItem(self, index, name):
 	self.SetCurrentItem(name)
 	self.CloseListBox()
@@ -124,13 +130,65 @@ def OnSelectItem(self, index, name):
 	
 def GetSelectedIndex(self):
 	return self.listBox.GetSelectedItem()
+
+
+
+#Checks if inventory is full by checking empty spaces
+def isInventoryFull():
+	numItems = MAX_INVENTORY_SIZE
+	for i in range(0,MAX_INVENTORY_SIZE):
+		curr_id = player.GetItemIndex(i)
+		if curr_id != 0:
+			numItems-=1
 	
+	if numItems < INV_FULL_MIN_EMPTY:
+		return True
+	else:
+		return False
+	
+#return -1 on error
+def GetItemByType(_id):
+	for i in range(0,MAX_INVENTORY_SIZE):
+		curr_id = player.GetItemIndex(i)
+		if curr_id == 0:
+			continue
+		item.SelectItem(curr_id)
+		if item.GetItemType() == _id:
+			return i
+	return -1
+
+def UseAnyItemByID(id_list):
+	for i in range(0,MAX_INVENTORY_SIZE):
+		if player.GetItemIndex(i) in id_list:
+			net.SendItemUsePacket(i)
+	return -1
+
+
 def GetItemByID(_id):
-	for i in xrange(90,-1,-1):
+	for i in range(0,MAX_INVENTORY_SIZE):
 		if player.GetItemIndex(i) == _id:
 			return i
 	return -1
 
+def isItemTypeOnSlot(_type,invType = player.EQUIPMENT,slot=item.EQUIPMENT_WEAPON):
+	idx = player.GetItemIndex(invType,slot)
+	if idx != 0:
+		item.SelectItem(idx)
+		if item.GetItemType() == _type:
+			return True
+	return False
+
+#returns a dicitionary containing the positions of each id in _id_list
+def GetItemsSlotsByID(_id_list):
+	result = {_id : [] for _id in _id_list}
+	for i in range(0,MAX_INVENTORY_SIZE):
+		id = player.GetItemIndex(i)
+		if player.GetItemIndex(i) in _id_list:
+			result[id].append(i)
+	return result
+
+
+#Return the angle needed to rotate from x0,y0 to x1,y1
 def GetRotation(x0,y0,x1,y1):
     x1_relative = x1-x0
     y1_relative = y1-y0
@@ -141,12 +199,8 @@ def GetRotation(x0,y0,x1,y1):
     except:
         rada = 0
     return rada
-    #angleInDegrees += math.pi
-    
-    #chat.AppendChat(3, "atan3:  "+str(angleInDegrees* (180 / math.pi)))
-    #chat.AppendChat(3,str(angleInDegrees* (180 / math.pi)))
-    #return (angle)
 
+#Rotate Main Character to  x,y
 def RotateMainCharacter(x,y):
     my_x,my_y,my_z = player.GetMainCharacterPosition()
     chr.SelectInstance(player.GetMainCharacterIndex())
@@ -155,7 +209,10 @@ def RotateMainCharacter(x,y):
     
     
 def GetCurrentPhase():
-    return m2k_hook.CURRENT_PHASE
+    return Hooks.GetCurrentPhase()
+
+def IsInGamePhase():
+	return GetCurrentPhase() == PHASE_GAME
 
 def isPlayerCloseToInstance(vid_target):
 	my_vid = net.GetMainActorVID()
@@ -185,7 +242,7 @@ def getClosestInstance(_type,is_unblocked=True):
 			continue
 
 		type = chr.GetInstanceType(vid)
-		if type == _type or (_type == BOSS_TYPE and isBoss(vid)):
+		if type in _type or (BOSS_TYPE in type and isBoss(vid)):
 			if this_distance < _dist and not isPlayerCloseToInstance(vid):
 				_dist = this_distance
 				closest_vid = vid
@@ -196,7 +253,7 @@ MOVING_TO_TARGET = 1
 ATTACKING_TARGET = 0
 TARGET_IS_DEAD = -1
 
-#Retuns -1 of is dead, 0 if attacking target or 1 if moving to target
+#Retuns -1 if is dead, 0 if attacking target or 1 if moving to target
 def AttackTarget(vid):
     if net_packet.IsDead(vid):
         return TARGET_IS_DEAD
@@ -215,7 +272,7 @@ def AttackTarget(vid):
 #Extracts an encrypted eter pakcet to Extractor folder inside the client
 def extractFile(path):
     import os
-    initial_folder = "Extractor\\"
+    initial_folder = net_packet.PATH+"Extractor\\"
     file_location = initial_folder + path
     file_location = file_location.replace(":","")
     _str = net_packet.Get(path)
@@ -226,32 +283,34 @@ def extractFile(path):
 
     with open(file_location, "wb") as myfile:
         myfile.write(_str)
+
+
+#Return point between 2 points at the specified distance from x1,y1
+#If overflow=False and dist_ is bigger then the distance between the 2 points
+#the function will return x2,y2, otherwise it will return a point beyond x2,y2
+def getPointsDistance(x1,y1,x2,y2,dist_,allow_overflow=False):
+	d = dist(x1,y1,x2,y2)
+	if(d < 0.0001):
+		return(x1,y1)
+	if not allow_overflow:
+		if (dist_>d):
+			return (x2,y2)
+	ux = (x2-x1)/d
+	uy = (y2-y1)/d
+
+	x = ux*dist_ + x1
+	y = uy*dist_ + y1
+	return (x,y)
 	
 ui.ComboBox.GetCurrentText = GetCurrentText
 ui.ComboBox.GetSelectedIndex = GetSelectedIndex
 ui.ComboBox.OnSelectItem = OnSelectItem
 
 
-class ByteMatrix:
-    def __init__(self,max_x,max_y):
-        self.buffer = bytearray(max_x*max_y)
-        self.max_x = max_x
-        self.max_y = max_y
-        self.total_size = max_x*max_y
-        
-    def Get(self,x,y):
-        if(x >= self.max_x):
-            raise "Out of Bounds"
-        
-        return self.buffer[self.max_x*y + x]
-    
-    def Set(self,x,y,value):
-        if(x >= self.max_x):
-            raise "Out of Bounds"
-        self.buffer[self.max_x*y + x] = value
-
+#func is a callback that give responsabilty to the caller for changing the state
+#funcState is a callback that automatically changes the sate and pass it (the new state) as argument
 class OnOffButton(ui.Button):
-	def __init__(self,OffUpVisual, OffOverVisual, OffDownVisual,OnUpVisual, OnOverVisual, OnDownVisual, image=None,func=None,tooltip=None):
+	def __init__(self,OffUpVisual, OffOverVisual, OffDownVisual,OnUpVisual, OnOverVisual, OnDownVisual, image=None,func=None,tooltip=None,funcState=None):
 		ui.Button.__init__(self)
 		self.OffUpVisual = OffUpVisual
 		self.OffOverVisual = OffOverVisual 
@@ -259,6 +318,7 @@ class OnOffButton(ui.Button):
 		self.OnUpVisual = OnUpVisual
 		self.OnOverVisual = OnUpVisual
 		self.OnDownVisual = OnDownVisual
+		self.FuncState = funcState
 		self.isOn = 1
 		self.ExpandedImage = image 
 		self.SetOn()
@@ -272,6 +332,9 @@ class OnOffButton(ui.Button):
 			self.SetOff()
 		else:
 			self.SetOn()
+
+		if self.FuncState != None:
+			self.FuncState(self.isOn)
 
 	def SetValue(self,val):
 		if val == 1:
@@ -336,13 +399,13 @@ class Component:
 		button.SetEvent(func)
 		return button
 
-	def OnOffButton(self,parent,buttonName, tooltipText,x,y,func=None,image=None,OffUpVisual='m2kmod/Images/off_0.tga', OffOverVisual='m2kmod/Images/off_1.tga', OffDownVisual='m2kmod/Images/off_2.tga',OnUpVisual='m2kmod/Images/on_0.tga', OnOverVisual='m2kmod/Images/on_1.tga', OnDownVisual='m2kmod/Images/on_2.tga'):
+	def OnOffButton(self,parent,buttonName, tooltipText,x,y,func=None,image=None,OffUpVisual='m2kmod/Images/off_0.tga', OffOverVisual='m2kmod/Images/off_1.tga', OffDownVisual='m2kmod/Images/off_2.tga',OnUpVisual='m2kmod/Images/on_0.tga', OnOverVisual='m2kmod/Images/on_1.tga', OnDownVisual='m2kmod/Images/on_2.tga',xImgOffset = 15,yImgOffset = 15,funcState=None):
 		if image != None:
 			image = self.ExpandedImage(parent,x,y,image)
-			x += 15
-			y += 15
+			x += xImgOffset
+			y += yImgOffset
 
-		button = OnOffButton(OffUpVisual, OffOverVisual, OffDownVisual,OnUpVisual, OnOverVisual, OnDownVisual,image=image,func=func)
+		button = OnOffButton(OffUpVisual, OffOverVisual, OffDownVisual,OnUpVisual, OnOverVisual, OnDownVisual,image=image,func=func,funcState=funcState)
 		if parent != None:
 			button.SetParent(parent)
 		button.SetPosition(x, y)
@@ -603,8 +666,8 @@ def GetCurrentChannel():
 	except:
 		return 0
 
-def ChangeChannel(val):
-    net.SendChatPacket('/ch ' + str(val))
+#def ChangeChannel(val):
+#    net.SendChatPacket('/ch ' + str(val))
 
 class WaitingDialog(ui.ScriptWindow):
 
@@ -640,7 +703,7 @@ class WaitingDialog(ui.ScriptWindow):
 		
 	def OnPressExitKey(self):
 		self.Close()
-		return TRUE
+		return True
 		
 class Item(ui.ListBoxEx.Item):
 	def __init__(self, fileName):
@@ -838,7 +901,9 @@ class SkillButton(ui.Window):
 	def IsDown(self):
 		return wndMgr.IsDown(self.hWnd)
 
+#LoadDictFile(CONFIG_PSHOP_AUTO_BUY,SEARCH_ITEMS_MAX_PRICE,float)
 
-LoadBossList()
-m2k_hook.hookSetPhaseWindow()
+
+
+FileManager.LoadDictFile(CONFIG_BOSSES_ID,BOSS_IDS,int)
 import Movement

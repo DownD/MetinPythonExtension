@@ -1,17 +1,17 @@
 import ui,app,net,player,chr,miniMap,wndMgr,background,math,uiMiniMap,m2k_lib,chat,exception,Movement
 
-TeleportHackMode = "Teleport"		
+TeleportHackMode = "Teleport"
+timerrBlock = 0	
 
 class TeleportHackDialog(ui.ScriptWindow):
 
 	CurrentMapName = ""
 	
 	class AtlasRenderer(ui.Window):
-		TeleportState = 1
 		def __init__(self):
 			ui.Window.__init__(self)
 			self.AddFlag("not_pick")
-	#		self.AddFlag('movable')
+		#	self.AddFlag('movable')
 
 		def OnUpdate(self):
 			miniMap.UpdateAtlas()
@@ -20,10 +20,8 @@ class TeleportHackDialog(ui.ScriptWindow):
 			(PosX, PosY) = self.GetGlobalPosition()
 			miniMap.RenderAtlas(float(PosX), float(PosY))
 			
-			if self.TeleportState == 0:
-				self.Debug()
 				
-			if app.IsPressed(app.DIK_LSHIFT) and self.TeleportState == 1:
+			if app.IsPressed(app.DIK_LSHIFT):
 				(mouseX, mouseY) = wndMgr.GetMousePosition()
 				(bFind, sName, iPosX, iPosY, dwTextColor, dwGuildID) = miniMap.GetAtlasInfo(mouseX, mouseY)
 				
@@ -40,34 +38,23 @@ class TeleportHackDialog(ui.ScriptWindow):
 				
 				if iPosX < 0 or iPosY < 0 or iPosX > SizeX * 256 or iPosY > SizeY * 256:
 					return
-
-				self.TeleportState = 0
-				
+				 
 				self.TeleportToDest(iPosX*100, iPosY*100)
 
 		def TeleportToDest(self, aimx, aimy):
-			global TeleportHackMode
+			global TeleportHackMode,timerrBlock
+			val, timerrBlock = m2k_lib.timeSleep(timerrBlock,2) #Avoid multiple calls on same keypress
+			if val == False:
+				return
 			if TeleportHackMode == "Walk":
 				chat.AppendChat(3,str(aimx) + " " + str(aimy))
 				Movement.GoToPositionAvoidingObjects(aimx,aimy)
-				self.TeleportState = 1
-			else:		
-				(TmpX, TmpY, Count) = GetTmpTeleport(aimx, aimy)
-				TmpCount = 0
-				
-				while TmpCount < Count:
-					(TmpX, TmpY, Crap) = GetTmpTeleport(aimx, aimy)
-					chr.SetPixelPosition(int(TmpX), int(TmpY))
-					TmpCount += 1
-					self.Debug()
-					
-				chr.SetPixelPosition(int(aimx), int(aimy))
-				self.Debug()
-				self.TeleportState = 1
-
+			else:
+				Movement.TeleportToPosition(aimx,aimy)
 		def Debug(self):
-			player.SetSingleDIKKeyState(app.DIK_UP, TRUE)
-			player.SetSingleDIKKeyState(app.DIK_UP, FALSE)			
+			pass
+			#player.SetSingleDIKKeyState(app.DIK_UP, TRUE)
+			#player.SetSingleDIKKeyState(app.DIK_UP, FALSE)			
 
 		def ShowAtlas(self):
 			miniMap.ShowAtlas()
@@ -82,8 +69,7 @@ class TeleportHackDialog(ui.ScriptWindow):
 		self.board = 0
 		self.CurrentMapName = background.GetCurrentMapName()
 		ui.ScriptWindow.__init__(self)
-		self.LoadWindow()
-		chat.AppendChat(7, '[m2k-Mod] Please teleport in small steps! ')	
+		self.LoadWindow()	
 
 	def LoadWindow(self):
 		try:
@@ -94,13 +80,13 @@ class TeleportHackDialog(ui.ScriptWindow):
 
 		try:
 			self.board = self.GetChild("board")
-			#self.board.SetTitleName("Teleporthack")
+			self.board.SetTitleName("Teleporthack")
 
 		except:
 			exception.Abort("AtlasWindow.LoadWindow.BindObject")
 
 		self.AtlasMainWindow = self.AtlasRenderer()
-		#self.SetCloseEvent(self.Hide)
+		self.board.SetCloseEvent(self.Hide)
 		self.AtlasMainWindow.SetParent(self.board)
 		self.AtlasMainWindow.SetPosition(7, 30)
 		self.tooltipInfo.SetParent(self.board)

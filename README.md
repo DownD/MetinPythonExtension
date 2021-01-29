@@ -15,3 +15,9 @@ Bot to be used with my c++ python library.
 
 ### V0.4
 - Implemented pathfinding algorithm, for the character to follow a path
+
+
+# Problems
+- WaitHack Not Working
+- GetPixelPosition gives the end position after a movement instead of the current position
+-- Offsets for Player instance will be needed

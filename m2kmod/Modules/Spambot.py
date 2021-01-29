@@ -1,5 +1,5 @@
 import ui,app,chat,chr,net,player,item,skill,time,game,shop,chrmgr
-import background,constInfo,wndMgr,math,uiCommon,grp,dbg,m2k_lib
+import background,constInfo,wndMgr,math,uiCommon,grp,dbg,m2k_lib,FileManager
 
 class SpamDialog(ui.ScriptWindow):
 	
@@ -23,10 +23,10 @@ class SpamDialog(ui.ScriptWindow):
 		self.Slotbar, self.SpamText = self.comp.EditLine(self.Board, '', 23, 29, 150, 75, 150)
 		self.SpamCombo = self.comp.ComboBoxFunc(self.Board, '<choose>', 69, 115, 60, self.GetTextContent)
 		
-		self.SpamStatus = int(m2k_lib.ReadConfig("SpamStatus"))
-		self.Delay = int(m2k_lib.ReadConfig("SpamDelay"))
-		self.CurrentNum = m2k_lib.ReadConfig("CurrentText")
-		self.Type = m2k_lib.ReadConfig("Type")
+		self.SpamStatus = int(FileManager.ReadConfig("SpamStatus"))
+		self.Delay = int(FileManager.ReadConfig("SpamDelay"))
+		self.CurrentNum = FileManager.ReadConfig("CurrentText")
+		self.Type = FileManager.ReadConfig("Type")
 	
 		if self.SpamStatus == 1:
 			self.SpamOff.Show()
@@ -56,11 +56,11 @@ class SpamDialog(ui.ScriptWindow):
 			self.Board.Show()
 	def Hide_UI(self):
 		self.Board.Hide()
-		m2k_lib.SaveConfig("SpamStatus", str(self.SpamStatus))
-		m2k_lib.SaveConfig("SpamDelay", str(self.Delay))
-		m2k_lib.SaveConfig("Type", str(self.Type))
-		m2k_lib.SaveConfig("CurrentText", str(self.CurrentNum))
-		
+		FileManager.WriteConfig("SpamStatus", str(self.SpamStatus))
+		FileManager.WriteConfig("SpamDelay", str(self.Delay))
+		FileManager.WriteConfig("Type", str(self.Type))
+		FileManager.WriteConfig("CurrentText", str(self.CurrentNum))
+		FileManager.Save()
 	
 	def SlideFunc(self):
 		self.Delay = int((self.DelaySlide.GetSliderPos()*100)+0.001)
@@ -104,8 +104,9 @@ class SpamDialog(ui.ScriptWindow):
 		self.UpdateSpam.Close()
 		
 	def GetTextContent(self):	
-		self.SpamText.SetText(m2k_lib.ReadConfig(self.SpamCombo.GetCurrentText()))
+		self.SpamText.SetText(FileManager.ReadConfig(self.SpamCombo.GetCurrentText()))
 		self.CurrentNum = self.SpamCombo.GetCurrentText()
 	
 	def SaveTextContent(self):
-		m2k_lib.SaveConfig("Text"+str(num), self.SpamText.GetText())
+		FileManager.WriteConfig("Text"+str(num), self.SpamText.GetText())
+		FileManager.Save()

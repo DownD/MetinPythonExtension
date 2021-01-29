@@ -1,7 +1,7 @@
-import ui,app,chat,chr,net,player,item,skill,time,game,shop,chrmgr
-import background,constInfo,wndMgr,math,uiCommon,grp,m2k_lib
+import ui,app,chat,player,item
+import grp,m2k_lib,FileManager
 	
-lang = m2k_lib.ReadConfig("Language")
+lang = FileManager.ReadConfig("Language")
 if lang == "German":
 	BonusListe = (  
 		"","Max. TP","Max. MP","Vitalitaet","Intelligenz","Staerke","Ausweichwert","Angriffsgeschwindigkeit","Bewegungsgeschwindigkeit","Zaubergeschwindigkeit", "TP-Regeneration","MP-Regeneration","Vergiftungschance","Ohnmachtschance","Verlangsamungschance","Kritischer Treffer","Durchbohrender Treffer","Stark ggn Halbmenschen","Stark ggn Tiere","Stark ggn Orks","Stark ggn Esoterische","Stark ggn Untote","Stark ggn Teufel","TP-Absorbierung","MP-Absorbierung","Chance auf Manaraub","Chance MP-Regeneration","Nahkampf-Angriff blocken","Pfeilangriff ausweichen","Schwertverteidigung","Zweihandverteidigung","Dolchverteidigung","Glockenverteidigung","Faecherverteidigung","Pfeilwiderstand","Feuerwiderstand","Blitzwiderstand","Magieverteidigung","Windwiderstand","Nahkampftreffer reflektieren","Fluch reflektieren","Giftwiderstand","Chance MP wiederherzustellen","Exp-Bonus","Yang-Drop","Item-Drop","steigernde Trankwirkung","Chance TP wiederherzustellen","Immun gegen Ohnmacht","Immun gegen Verlangsamung","Immun gegen Stuerzen","APPLY_SKILL","Pfeilreichweite","Angriffswert","Verteidigungswert","Magischer Angriffswert","Magischer Verteidigungswert","","Max. Ausdauer","Stark gegen Krieger","Stark gegen Ninjas","Stark gegen Suras","Stark gegen Schamanen","Stark gegen Monster","Itemshop Angriffswert","Itemshop Verteidigungswert","Itemshop Exp-Bonus","Itemshop Item-Bonus","Itemshop Yang-Bonus", "APPLY_MAX_HP_PCT","APPLY_MAX_SP_PCT","Fertigkeitsschaden","Durchschn. Schaden","Fertigkeitsschaden Widerstand","Durchschn. Schadenswiderstand","","iCafe EXP-Bonus","iCafe Item-Bonus","Abwehr ggn Krieger","Abwehr ggn Ninjas","Abwehr ggn Suras","Abwehr ggn Schamanen",
@@ -64,25 +64,25 @@ class CreateItemDialog(ui.Window):
 		self.Metin2Button = self.comp.Button(self.Board, 'Choose Stone 2', '', 240, 120, lambda : self.CallStoneList(2), 'd:/ymir work/ui/public/large_Button_01.sub', 'd:/ymir work/ui/public/large_Button_02.sub', 'd:/ymir work/ui/public/large_Button_03.sub')
 		self.Metin3Button = self.comp.Button(self.Board, 'Choose Stone 3', '', 240, 155, lambda : self.CallStoneList(3), 'd:/ymir work/ui/public/large_Button_01.sub', 'd:/ymir work/ui/public/large_Button_02.sub', 'd:/ymir work/ui/public/large_Button_03.sub')
 		
-		self.ItemValueSlotBar, self.ItemValueEditLine = self.comp.EditLine(self.Board, int(m2k_lib.ReadConfig("ItemValue")), 70, 35, 35, 14, 5)
+		self.ItemValueSlotBar, self.ItemValueEditLine = self.comp.EditLine(self.Board, int(FileManager.ReadConfig("ItemValue")), 70, 35, 35, 14, 5)
 		self.ItemCountEditLine = self.comp.OnlyEditLine(self.Board, 21, 18, 290, 35, '1', 3)
-		self.Bonus1ValueEditLine = self.comp.OnlyEditLine(self.Board, 29, 18, 211, 190, m2k_lib.ReadConfig("BonusValue0"), 4)
-		self.Bonus2ValueEditLine = self.comp.OnlyEditLine(self.Board, 29, 18, 211, 210, m2k_lib.ReadConfig("BonusValue1"), 4)
-		self.Bonus3ValueEditLine = self.comp.OnlyEditLine(self.Board, 29, 18, 211, 230, m2k_lib.ReadConfig("BonusValue2"), 4)
-		self.Bonus4ValueEditLine = self.comp.OnlyEditLine(self.Board, 29, 18, 211, 250, m2k_lib.ReadConfig("BonusValue3"), 4)
-		self.Bonus5ValueEditLine = self.comp.OnlyEditLine(self.Board, 29, 18, 211, 270, m2k_lib.ReadConfig("BonusValue4"), 4)
+		self.Bonus1ValueEditLine = self.comp.OnlyEditLine(self.Board, 29, 18, 211, 190, FileManager.ReadConfig("BonusValue0"), 4)
+		self.Bonus2ValueEditLine = self.comp.OnlyEditLine(self.Board, 29, 18, 211, 210, FileManager.ReadConfig("BonusValue1"), 4)
+		self.Bonus3ValueEditLine = self.comp.OnlyEditLine(self.Board, 29, 18, 211, 230, FileManager.ReadConfig("BonusValue2"), 4)
+		self.Bonus4ValueEditLine = self.comp.OnlyEditLine(self.Board, 29, 18, 211, 250, FileManager.ReadConfig("BonusValue3"), 4)
+		self.Bonus5ValueEditLine = self.comp.OnlyEditLine(self.Board, 29, 18, 211, 270, FileManager.ReadConfig("BonusValue4"), 4)
 		
 		self.ItemImage = self.comp.ExpandedImage(self.Board, 17, 80, "m2kmod\Images\epvp.tga")
-		self.Metin1Image = self.comp.ExpandedImage(self.Board, 65, 80, "")
-		self.Metin2Image = self.comp.ExpandedImage(self.Board, 65, 115, "")
-		self.Metin3Image = self.comp.ExpandedImage(self.Board, 65, 150, "")
+		self.Metin1Image = self.comp.ExpandedImage(self.Board, 65, 80, "m2kmod\Images\epvp.tga")
+		self.Metin2Image = self.comp.ExpandedImage(self.Board, 65, 115, "m2kmod\Images\epvp.tga")
+		self.Metin3Image = self.comp.ExpandedImage(self.Board, 65, 150, "m2kmod\Images\epvp.tga")
 
 		for i in xrange(5):
-			self.UpdateBonus(i,int(m2k_lib.ReadConfig("CreateBonus"+str(i))))
+			self.UpdateBonus(i,int(FileManager.ReadConfig("CreateBonus"+str(i))))
 		if player.GetName() != "":
 			for i in xrange(3):
-				self.UpdateStone(i+1,int(m2k_lib.ReadConfig("MetinStone"+str(i+1))))
-			self.UpdateItem(int(m2k_lib.ReadConfig("ItemValue")))
+				self.UpdateStone(i+1,int(FileManager.ReadConfig("MetinStone"+str(i+1))))
+			self.UpdateItem(int(FileManager.ReadConfig("ItemValue")))
 			
 	def switch_state(self):
 		if self.Board.IsShow():
@@ -91,20 +91,21 @@ class CreateItemDialog(ui.Window):
 			self.Board.Show()
 			
 	def Hide_UI(self):
-		m2k_lib.SaveConfig("ItemValue", str(self.ItemValueEditLine.GetText()))
-		m2k_lib.SaveConfig("CreateBonus0", str(self.CreateBonus0))
-		m2k_lib.SaveConfig("CreateBonus1", str(self.CreateBonus1))
-		m2k_lib.SaveConfig("CreateBonus2", str(self.CreateBonus2))
-		m2k_lib.SaveConfig("CreateBonus3", str(self.CreateBonus3))
-		m2k_lib.SaveConfig("CreateBonus4", str(self.CreateBonus4))
-		m2k_lib.SaveConfig("BonusValue0", str(self.Bonus1ValueEditLine.GetText()))
-		m2k_lib.SaveConfig("BonusValue1", str(self.Bonus2ValueEditLine.GetText()))
-		m2k_lib.SaveConfig("BonusValue2", str(self.Bonus3ValueEditLine.GetText()))
-		m2k_lib.SaveConfig("BonusValue3", str(self.Bonus4ValueEditLine.GetText()))
-		m2k_lib.SaveConfig("BonusValue4", str(self.Bonus5ValueEditLine.GetText()))
-		m2k_lib.SaveConfig("MetinStone1", str(self.MetinStone1))
-		m2k_lib.SaveConfig("MetinStone2", str(self.MetinStone2))
-		m2k_lib.SaveConfig("MetinStone3", str(self.MetinStone3))
+		FileManager.WriteConfig("ItemValue", str(self.ItemValueEditLine.GetText()))
+		FileManager.WriteConfig("CreateBonus0", str(self.CreateBonus0))
+		FileManager.WriteConfig("CreateBonus1", str(self.CreateBonus1))
+		FileManager.WriteConfig("CreateBonus2", str(self.CreateBonus2))
+		FileManager.WriteConfig("CreateBonus3", str(self.CreateBonus3))
+		FileManager.WriteConfig("CreateBonus4", str(self.CreateBonus4))
+		FileManager.WriteConfig("BonusValue0", str(self.Bonus1ValueEditLine.GetText()))
+		FileManager.WriteConfig("BonusValue1", str(self.Bonus2ValueEditLine.GetText()))
+		FileManager.WriteConfig("BonusValue2", str(self.Bonus3ValueEditLine.GetText()))
+		FileManager.WriteConfig("BonusValue3", str(self.Bonus4ValueEditLine.GetText()))
+		FileManager.WriteConfig("BonusValue4", str(self.Bonus5ValueEditLine.GetText()))
+		FileManager.WriteConfig("MetinStone1", str(self.MetinStone1))
+		FileManager.WriteConfig("MetinStone2", str(self.MetinStone2))
+		FileManager.WriteConfig("MetinStone3", str(self.MetinStone3))
+		FileManager.Save()
 		self.Board.Hide()
 		
 

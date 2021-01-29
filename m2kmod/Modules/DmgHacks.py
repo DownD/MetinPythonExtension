@@ -1,5 +1,5 @@
-import net_packet,ui,net,chr,player,chat
-import m2k_lib
+import net_packet,ui,net,chr,player,chat,item
+import m2k_lib,FileManager,Movement
 
 ATTACK_MAX_DIST_NO_TELEPORT = 290
 
@@ -7,6 +7,7 @@ ATTACK_MAX_DIST_NO_TELEPORT = 290
 class DmgHacks(ui.Window):
 	def __init__(self):
 		ui.Window.__init__(self)
+		self.pause = False
 		self.BuildWindow()
 
 	def __del__(self):
@@ -49,17 +50,18 @@ class DmgHacks(ui.Window):
 		self.Monster_func()
 
 	def loadSettings(self):
-		self.MonsterSlider.SetSliderPos(float(m2k_lib.ReadConfig("WaitHack_MaxMonsters")))
-		self.SpeedSlider.SetSliderPos(float(m2k_lib.ReadConfig("WaitHack_Speed")))
-		self.RangeSlider.SetSliderPos(float(m2k_lib.ReadConfig("WaitHack_Range")))
-		self.MetinButton.SetValue(int(m2k_lib.ReadConfig("WaitHack_MetinAttack")))
-		self.playerClose.SetValue(int(m2k_lib.ReadConfig("WaitHack_PlayerClose")))
+		self.MonsterSlider.SetSliderPos(float(FileManager.ReadConfig("WaitHack_MaxMonsters")))
+		self.SpeedSlider.SetSliderPos(float(FileManager.ReadConfig("WaitHack_Speed")))
+		self.RangeSlider.SetSliderPos(float(FileManager.ReadConfig("WaitHack_Range")))
+		self.MetinButton.SetValue(int(FileManager.ReadConfig("WaitHack_MetinAttack")))
+		self.playerClose.SetValue(int(FileManager.ReadConfig("WaitHack_PlayerClose")))
 	def saveSettings(self):
-		m2k_lib.SaveConfig("WaitHack_MaxMonsters", str(self.MonsterSlider.GetSliderPos()))
-		m2k_lib.SaveConfig("WaitHack_Speed", str(self.SpeedSlider.GetSliderPos()))
-		m2k_lib.SaveConfig("WaitHack_Range", str(self.RangeSlider.GetSliderPos()))
-		m2k_lib.SaveConfig("WaitHack_MetinAttack", str(self.MetinButton.isOn))
-		m2k_lib.SaveConfig("WaitHack_PlayerClose", str(self.playerClose.isOn))
+		FileManager.WriteConfig("WaitHack_MaxMonsters", str(self.MonsterSlider.GetSliderPos()))
+		FileManager.WriteConfig("WaitHack_Speed", str(self.SpeedSlider.GetSliderPos()))
+		FileManager.WriteConfig("WaitHack_Range", str(self.RangeSlider.GetSliderPos()))
+		FileManager.WriteConfig("WaitHack_MetinAttack", str(self.MetinButton.isOn))
+		FileManager.WriteConfig("WaitHack_PlayerClose", str(self.playerClose.isOn))
+		FileManager.Save()
 	
 	
 	def Monster_func(self):
@@ -81,34 +83,61 @@ class DmgHacks(ui.Window):
 		else:
 			self.Board.Show()
    
-	def TeleportAttack(self,lst,x,y,attack_type):
-		#net_packet.SendStatePacket(x,y,0,1,0)
-		#net_packet.SendStatePacket(x,y,0,0,0)
-		net_packet.SendStatePacket(x,y,0,3,attack_type)
-		#chat.AppendChat(3,"Before: " + str(len(lst))) 
+	def TeleportAttack(self,lst,x,y):
+		Movement.TeleportStraightLine(self.lastPos[0],self.lastPos[1],x,y)
+		self.lastPos = (x,y)
+		net_packet.SendStatePacket(x,y,0,net_packet.CHAR_STATE_STOP,0)
 		vid_hits = 0
 		for vid in lst:
 			mob_x, mob_y, mob_z = chr.GetPixelPosition(vid)
 			if m2k_lib.dist(x,y,mob_x,mob_y) < ATTACK_MAX_DIST_NO_TELEPORT:
-				#chat.AppendChat(3,"Sent Attack")
+				chat.AppendChat(3,"Sent Attack, X:" + str(mob_x) + " Y:" + str(mob_y) + "VID: " +str(vid))
 				net_packet.SendAttackPacket(vid,0)
 				lst.remove(vid)
 				vid_hits+=1
 		
 		return vid_hits
-		#chat.AppendChat(3,"After: " + str(len(lst))) 
+		#chat.AppendChat(3,"After: " + str(len(lst)))
+
+	def IsWeaponArch(self):
+		idx = player.GetItemIndex(player.EQUIPMENT,item.EQUIPMENT_WEAPON)
+		if idx == 0:
+			return False
+		item.SelectItem(idx)
+		if item.GetItemType() == item.ITEM_TYPE_WEAPON and item.GetItemSubType() == item.WEAPON_BOW:
+			return True
+		return False
+
+	def AttackArch(self,lst,x,y):
+		vid_hits = 0
+		chat.AppendChat(3,"Attacking with arch")
+		for enemy in lst:
+			x,y,z = chr.GetPixelPosition(enemy)
+			net_packet.SendAddFlyTarget(enemy,x,y)
+			net_packet.SendShoot(net_packet.COMBO_SKILL_ARCH)
+			lst.remove(enemy)
+			vid_hits+=1
+		return vid_hits
     
 				
 	def OnUpdate(self):
 		val, self.lastTime = m2k_lib.timeSleep(self.lastTime,self.speed)
 		#chat.AppendChat(3,str(self.speed))
-		if(val and self.enableButton.isOn):
-			#chat.AppendChat(3,"Loop")
-			x,y,z = chr.GetPixelPosition(net.GetMainActorVID())
+		if(val and self.enableButton.isOn and not self.pause):
+			if m2k_lib.GetCurrentPhase() != m2k_lib.PHASE_GAME:
+				return
+			isArch = self.IsWeaponArch()
+			main_vid = net.GetMainActorVID()
+			x,y,z = chr.GetPixelPosition(main_vid)
+			self.lastPos = (x,y)
 			lst = list()
    			for vid in net_packet.InstancesList:
+				if vid == main_vid:
+					continue
+
 				if not chr.HasInstance(vid):
 					continue
+				#chat.AppendChat(3,str(chr.GetInstanceType(vid)))
 				if self.playerClose.isOn and chr.GetInstanceType(vid) == m2k_lib.PLAYER_TYPE and vid != net.GetMainActorVID():
 					return
 				if self.MetinButton.isOn and chr.GetInstanceType(vid) != m2k_lib.METIN_TYPE:
@@ -123,13 +152,22 @@ class DmgHacks(ui.Window):
 				if net_packet.IsPositionBlocked(mob_x,mob_y):
 					lst.remove(vid)
 					continue
-				hit_counter+=self.TeleportAttack(lst,mob_x, mob_y, 15 + (i %2))
-				#net_packet.SendStatePacket(x,y,0,1,0)
+				#Checking the distance between teleports might increase the range and make it more stable
+				if isArch:
+					hit_counter+=self.AttackArch(lst,mob_x, mob_y)
+				else:
+					hit_counter+=self.TeleportAttack(lst,mob_x, mob_y)
 				i+=1
-	
+			Movement.TeleportStraightLine(self.lastPos[0],self.lastPos[1],x,y)
 	def Close(self):
 		self.Board.Hide()
 		self.saveSettings()
+
+def Pause():
+	Dmg.pause = True
+
+def Resume():
+	Dmg.pause = False
 
 Dmg = DmgHacks()
 Dmg.Show()

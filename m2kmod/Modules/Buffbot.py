@@ -1,5 +1,5 @@
-import ui,app,chat,chr,net,player,item,skill,time,game,shop,chrmgr
-import background,constInfo,wndMgr,math,uiCommon,grp,dbg,m2k_lib
+import ui,chat,chr,player,time
+import m2k_lib,FileManager
 
 class BuffDialog(ui.ScriptWindow):
 
@@ -38,13 +38,13 @@ class BuffDialog(ui.ScriptWindow):
 		self.FollowOn = self.comp.HideButton(self.Board, '', '', 135, 110, self.SetFollow, 'm2kmod/Images/on_0.tga', 'm2kmod/Images/on_1.tga', 'm2kmod/mages/on_2.tga')
 		self.FollowOff = self.comp.HideButton(self.Board, '', '', 135, 110, self.SetFollow, 'm2kmod/Images/off_0.tga', 'm2kmod/Images/off_1.tga', 'm2kmod/Images/off_2.tga')
 		
-		self.BuffStatus = int(m2k_lib.ReadConfig("BuffStatus"))
-		self.BuffDelay = int(m2k_lib.ReadConfig("BuffDelay"))
-		self.Segen = int(m2k_lib.ReadConfig("Segen"))
-		self.Reflekt = int(m2k_lib.ReadConfig("Reflekt"))
-		self.HDD = int(m2k_lib.ReadConfig("HDD"))
-		self.Follow = int(m2k_lib.ReadConfig("Follow"))
-		self.TargetVID = int(m2k_lib.ReadConfig("TargetVID"))
+		self.BuffStatus = int(FileManager.ReadConfig("BuffStatus"))
+		self.BuffDelay = int(FileManager.ReadConfig("BuffDelay"))
+		self.Segen = int(FileManager.ReadConfig("Segen"))
+		self.Reflekt = int(FileManager.ReadConfig("Reflekt"))
+		self.HDD = int(FileManager.ReadConfig("HDD"))
+		self.Follow = int(FileManager.ReadConfig("Follow"))
+		self.TargetVID = int(FileManager.ReadConfig("TargetVID"))
 		
 		if self.BuffStatus:
 			self.BuffOn.Show()
@@ -83,13 +83,14 @@ class BuffDialog(ui.ScriptWindow):
 			self.Board.Show()
 	def Hide_UI(self):
 		self.Board.Hide()
-		m2k_lib.SaveConfig("BuffStatus", str(self.BuffStatus))
-		m2k_lib.SaveConfig("BuffDelay", str(self.BuffDelay))
-		m2k_lib.SaveConfig("Segen", str(self.Segen))
-		m2k_lib.SaveConfig("Reflekt", str(self.Reflekt))
-		m2k_lib.SaveConfig("HDD", str(self.HDD))
-		m2k_lib.SaveConfig("Follow", str(self.Follow))
-		m2k_lib.SaveConfig("TargetVID", str(self.TargetVID))
+		FileManager.WriteConfig("BuffStatus", str(self.BuffStatus))
+		FileManager.WriteConfig("BuffDelay", str(self.BuffDelay))
+		FileManager.WriteConfig("Segen", str(self.Segen))
+		FileManager.WriteConfig("Reflekt", str(self.Reflekt))
+		FileManager.WriteConfig("HDD", str(self.HDD))
+		FileManager.WriteConfig("Follow", str(self.Follow))
+		FileManager.WriteConfig("TargetVID", str(self.TargetVID))
+		FileManager.Save()
 		
 		
 	def SetBuffStatus(self):

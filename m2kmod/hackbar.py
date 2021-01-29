@@ -1,9 +1,7 @@
-import ui,app,chat,chr,net,player,item,skill,time,game,shop,chrmgr
-import background,constInfo,miniMap,wndMgr,math,uiCommon,grp
+import ui,app,chat,chr,net,player,wndMgr,uiCommon
 
 
-from m2kmod.Modules import Filter,Telehack, PythonManager, m2k_lib, m2k_hook, Settings, Levelbot, Buffbot, Spambot, Bookreader, Soulstonereader, Shopcreator, Itemstealer, Inventorymanager, Info, Itemcreator, EQChanger, Taubuyer
-#import m2kmod_script
+from m2kmod.Modules import Hooks,m2k_lib,FileManager,MapManager,Movement,ShopNPC,UIComponents,BotBase,ShopSearcher,Filter,Telehack, PythonManager, Settings, Levelbot, Buffbot, Spambot, Shopcreator, Itemstealer, Inventorymanager, Itemcreator, EQChanger, FishingBot
 
 class M2kHackbarDialog(ui.ScriptWindow): 				
 	
@@ -12,19 +10,14 @@ class M2kHackbarDialog(ui.ScriptWindow):
 	ShortCuts = 0
 	
 	comp = m2k_lib.Component()
-	gnrl = Settings.SettingsDialog()
-	levl = Levelbot.LevelbotDialog()
 	buff = Buffbot.BuffDialog()
 	spam = Spambot.SpamDialog()
 	filter = Filter.FilterDialog()
 	
-	book = Bookreader.BookReaderDialog()
-	soul = Soulstonereader.SoulStoneBotDialog()
-	shop = Shopcreator.ShopDialog()
 	steal = Itemstealer.ItemStealerDialog()
 	tele = Telehack.TeleportHackDialog()
-	inve = Inventorymanager.InventoryDialog()
 	python_manager = PythonManager.PythonManagerDialog()
+
 	#swch = swich.Bot()
 	
 	def __init__(self):
@@ -60,14 +53,16 @@ class M2kHackbarDialog(ui.ScriptWindow):
 		self.GoLeft = self.comp.HideButton(None, '', '', wndMgr.GetScreenWidth()-290, 59, lambda : self.TeleportInDirection(4), 'm2kmod/Images/Shortcuts/Arrow/tele_left_0.tga', 'm2kmod/Images/Shortcuts/Arrow/tele_left_1.tga', 'm2kmod/Images/Shortcuts/Arrow/tele_left_0.tga')
 		
 		self.SettingsButton = self.comp.Button(self.m2kBoard, '', 'Settings', 9, 10, self.Generel, 'm2kmod/Images/Hackbar/sett_0.tga', 'm2kmod/Images/Hackbar/sett_1.tga', 'm2kmod/Images/Hackbar/sett_2.tga')
-		self.LevelbotButton = self.comp.Button(self.m2kBoard, '', 'Levelbot', 8, 43, self.Levelbot, 'm2kmod/Images/Hackbar/sword_0.tga', 'm2kmod/Images/Hackbar/sword_1.tga', 'm2kmod/Images/Hackbar/sword_0.tga')
+		self.LevelbotButton = self.comp.Button(self.m2kBoard, '', 'Levelbot', 8, 43, self.OnLevelbot, 'm2kmod/Images/Hackbar/sword_0.tga', 'm2kmod/Images/Hackbar/sword_1.tga', 'm2kmod/Images/Hackbar/sword_0.tga')
 		self.BuffbotButton = self.comp.Button(self.m2kBoard, '', 'Buffbot', 8, 78, self.BuffBot, 'm2kmod/Images/Hackbar/buff_0.tga', 'm2kmod/Images/Hackbar/buff_1.tga', 'm2kmod/Images/Hackbar/buff_0.tga')
 		self.SpambotButton = self.comp.Button(self.m2kBoard, '', 'Spambot', 8, 113, self.Spambot, 'm2kmod/Images/Hackbar/spam_0.tga', 'm2kmod/Images/Hackbar/spam_1.tga', 'm2kmod/Images/Hackbar/spam_0.tga')
 		#self.SwichbotButton = self.comp.Button(self.m2kBoard, '', 'Packet Analyzer', 8, 148, self.PacketAnalyzer, 'm2kmod/Images/Hackbar/swich_0.tga', 'm2kmod/Images/Hackbar/swich_1.tga', 'm2kmod/Images/Hackbar/swich_0.tga')
-		self.FBButton = self.comp.Button(self.m2kBoard, '', 'BookReader', 8, 183, self.BookReader, 'm2kmod/Images/Hackbar/fb_0.tga', 'm2kmod/Images/Hackbar/fb_1.tga', 'm2kmod/Images/Hackbar/fb_0.tga')
-		self.SeliButton = self.comp.Button(self.m2kBoard, '', 'SoulReader', 8, 218, self.SoulstoneReader, 'm2kmod/Images/Hackbar/seli_0.tga', 'm2kmod/Images/Hackbar/seli_1.tga', 'm2kmod/Images/Hackbar/seli_0.tga')
-		self.BuyTauButton = self.comp.Button(self.m2kBoard, '', 'Tau-Buyer', 8, 253, self.BuyTau, 'm2kmod/Images/Hackbar/tau_0.tga', 'm2kmod/Images/Hackbar/tau_1.tga', 'm2kmod/Images/Hackbar/tau_0.tga')
-		self.ShopCreator = self.comp.Button(self.m2kBoard, '', 'Shopbot', 8, 288, self.ShopCreator, 'm2kmod/Images/Hackbar/shop_0.tga', 'm2kmod/Images/Hackbar/shop_1.tga', 'm2kmod/Images/Hackbar/shop_0.tga')
+		#self.FBButton = self.comp.Button(self.m2kBoard, '', 'BookReader', 8, 183, self.BookReader, 'm2kmod/Images/Hackbar/fb_0.tga', 'm2kmod/Images/Hackbar/fb_1.tga', 'm2kmod/Images/Hackbar/fb_0.tga')
+		#self.SeliButton = self.comp.Button(self.m2kBoard, '', 'SoulReader', 8, 218, self.SoulstoneReader, 'm2kmod/Images/Hackbar/seli_0.tga', 'm2kmod/Images/Hackbar/seli_1.tga', 'm2kmod/Images/Hackbar/seli_0.tga')
+		self.SearchBotButton = self.comp.Button(self.m2kBoard, '', 'SearchBot', 10, 253, self.SearchBot, 'm2kmod/Images/Hackbar/search_0.tga', 'm2kmod/Images/Hackbar/search_1.tga', 'm2kmod/Images/Hackbar/search_0.tga')
+		self.ShopCreatorButton = self.comp.Button(self.m2kBoard, '', 'Shopbot', 8, 288, self.ShopCreator, 'm2kmod/Images/Hackbar/shop_0.tga', 'm2kmod/Images/Hackbar/shop_1.tga', 'm2kmod/Images/Hackbar/shop_0.tga')
+		self.FishingBotButton = self.comp.Button(self.m2kBoard, '', 'FishingBot', 8, 322, self.FishingBot, 'm2kmod/Images/Hackbar/fishing_0.tga', 'm2kmod/Images/Hackbar/fishing_1.tga', 'm2kmod/Images/Hackbar/fishing_0.tga')
+
 	#	self.ItemstealerCreator = self.comp.Button(self.m2kBoard, '', 'Itemstealer', 10, 325, self.Itemstealer, 'm2kmod/Images/Hackbar/pickup_0.tga', 'm2kmod/Images/Hackbar/pickup_1.tga', 'm2kmod/Images/Hackbar/pickup_0.tga')
 		self.TeleButton = self.comp.Button(self.m2kBoard, '', 'Teleport', 10, 360, self.TeleportHack, 'm2kmod/Images/Hackbar/teleport_0.tga', 'm2kmod/Images/Hackbar/teleport_1.tga', 'm2kmod/Images/Hackbar/teleport_0.tga')
 		self.InventoryButton = self.comp.Button(self.m2kBoard, '', 'Manager', 10, 395, self.InventoryManager, 'm2kmod/Images/Hackbar/inventory_0.tga', 'm2kmod/Images/Hackbar/inventory_1.tga', 'm2kmod/Images/Hackbar/inventory_0.tga')
@@ -84,7 +79,6 @@ class M2kHackbarDialog(ui.ScriptWindow):
 			pass
 		self.item = Itemcreator.CreateItemDialog()
 		self.equi = EQChanger.EquipmentDialog()
-		self.buyer = Taubuyer.TauAutobuyDialog()
 		if self.Hackbar:
 			self.Hackbar = 0
 			self.ShowHackbarButton.Show()
@@ -135,38 +129,31 @@ class M2kHackbarDialog(ui.ScriptWindow):
 			self.SpamtextCombo.Show()
 		
 	def Generel(self):
-		self.gnrl.switch_state()
-	def Levelbot(self):
-		self.levl.switch_state()
+		Settings.switch_state()
+	def OnLevelbot(self):
+		Levelbot.switch_state()
 	def BuffBot(self):
 		self.buff.switch_state()
 	def Spambot(self):	
 		self.spam.switch_state()
 	def PacketAnalyzer(self):
 		self.filter.switch_state()
-		return
-		#self.swch.switch_state()
-	def BookReader(self):
-		self.book.switch_state()
-	def SoulstoneReader(self):
-		self.soul.switch_state()
-	def BuyTau(self): 
-		self.buyer.switch_state()
+	def SearchBot(self):
+		ShopSearcher.switch_state()
 	def ShopCreator(self):
-		self.shop.switch_state()
+		Shopcreator.switch_state()
 	def Itemstealer(self):
 		self.steal.switch_state()
 	def TeleportHack(self):
 		self.tele.switch_state()
 	def InventoryManager(self):
-		self.inve.switch_state()
+		Inventorymanager.switch_state()
 	def	ItemCreator(self):
 		self.item.switch_state()
 	def EQChanger(self): 
 		self.equi.switch_state()
-	def Info(self): 
-		self.Inf = Info.InfoDialog()
-		self.Inf.Show()
+	def FishingBot(self): 
+		FishingBot.switch_state()
 		
 	
 	def GhostMod(self):
@@ -205,9 +192,9 @@ class M2kHackbarDialog(ui.ScriptWindow):
 	
 		
 	def SpamText(self):
-		self.AttackSpeed = int(m2k_lib.ReadConfig("AttackSpeed"))
-		Type = m2k_lib.ReadConfig("Type")
-		SpamText = m2k_lib.ReadConfig("Text"+str(self.SpamtextCombo.GetSelectedIndex()+1))
+		self.AttackSpeed = int(FileManager.ReadConfig("AttackSpeed"))
+		Type = FileManager.ReadConfig("Type")
+		SpamText = FileManager.ReadConfig("Text"+str(self.SpamtextCombo.GetSelectedIndex()+1))
 		
 		if Type == "Normal":
 			net.SendChatPacket(str(SpamText), chat.CHAT_TYPE_TALKING)
@@ -229,8 +216,8 @@ class M2kHackbarDialog(ui.ScriptWindow):
 			trueX = x - 2000
 			trueY = y
 		chr.SetPixelPosition(int(trueX), int(trueY), int(z))
-		player.SetSingleDIKKeyState(app.DIK_UP, TRUE)
-		player.SetSingleDIKKeyState(app.DIK_UP, FALSE)		
+		#player.SetSingleDIKKeyState(app.DIK_UP, TRUE)
+		#player.SetSingleDIKKeyState(app.DIK_UP, FALSE)		
 try:
 	app.Shop.Close()
 except:

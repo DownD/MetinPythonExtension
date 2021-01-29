@@ -1,5 +1,5 @@
-import ui,app,chat,chr,net,player,item,skill,time,game,shop,chrmgr
-import background,constInfo,wndMgr,math,uiCommon,grp,m2k_lib
+import ui,app,chat,chr,player,item,chrmgr
+import m2k_lib,FileManager
 	
 class EquipmentDialog(ui.ScriptWindow):
 
@@ -32,11 +32,11 @@ class EquipmentDialog(ui.ScriptWindow):
 		self.GMEffectOff = self.comp.HideButton(self.Board, '', '', 165, 115, self.SetGMEffect, 'm2kmod/Images/off_0.tga', 'm2kmod/Images/off_1.tga', 'm2kmod/Images/off_2.tga')
 		
 		if player.GetName() != "":
-			self.UpdateWeapon(int(m2k_lib.ReadConfig("WeaponID")))
-			self.UpdateArmor(int(m2k_lib.ReadConfig("ArmorID")))
-		self.NameEditLine.SetText(m2k_lib.ReadConfig("FakeName"))
-		self.FakeName = int(m2k_lib.ReadConfig("Fake_Name"))
-		self.GMEffect = int(m2k_lib.ReadConfig("GMEffect"))
+			self.UpdateWeapon(int(FileManager.ReadConfig("WeaponID")))
+			self.UpdateArmor(int(FileManager.ReadConfig("ArmorID")))
+		self.NameEditLine.SetText(FileManager.ReadConfig("FakeName"))
+		self.FakeName = int(FileManager.ReadConfig("Fake_Name"))
+		self.GMEffect = int(FileManager.ReadConfig("GMEffect"))
 		
 		if self.FakeName:
 			self.FakeNameOn.Show()
@@ -53,11 +53,12 @@ class EquipmentDialog(ui.ScriptWindow):
 		else:
 			self.Board.Show()	
 	def Hide_UI(self):
-		m2k_lib.SaveConfig("WeaponID", str(self.WeaponEditLine.GetText()))
-		m2k_lib.SaveConfig("ArmorID", str(self.ArmorEditLine.GetText()))
-		m2k_lib.SaveConfig("FakeName", str(self.NameEditLine.GetText()))
-		m2k_lib.SaveConfig("Fake_Name", str(self.FakeName))
-		m2k_lib.SaveConfig("GMEffect", str(self.GMEffect))
+		FileManager.WriteConfig("WeaponID", str(self.WeaponEditLine.GetText()))
+		FileManager.WriteConfig("ArmorID", str(self.ArmorEditLine.GetText()))
+		FileManager.WriteConfig("FakeName", str(self.NameEditLine.GetText()))
+		FileManager.WriteConfig("Fake_Name", str(self.FakeName))
+		FileManager.WriteConfig("GMEffect", str(self.GMEffect))
+		FileManager.Save()
 		self.Board.Hide()
 
 

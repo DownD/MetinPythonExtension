@@ -1,9 +1,5 @@
 import ui
-import dbg
-import app
-import m2k_lib
-import net_packet
-import chat
+import m2k_lib,net_packet
 
 class FilterDialog(ui.Window):
 	def __init__(self):

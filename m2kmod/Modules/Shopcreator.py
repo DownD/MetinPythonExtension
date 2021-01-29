@@ -1,160 +1,145 @@
-import ui,app,chat,chr,net,player,item,skill,time,game,shop,chrmgr
-import background,constInfo,wndMgr,math,uiCommon,grp,dbg,m2k_lib
+import ui,app,chat,chr,net,player,item,skill,time,game,shop,chrmgr,player
+import background,constInfo,wndMgr,math,uiCommon,grp,dbg,m2k_lib,FileManager
 
-ListOfItems = [ [ 0 for x in xrange(2) ] for x in xrange(50) ]
+
+SHOP_PACKET_ID = 50200 
+PREMIUM_SHOP_PACKET_ID = 71221
 
 class ShopDialog(ui.ScriptWindow):
 	
-	Gui = {}
+	MAX_NUM_SLOT = 40
+	MAX_NUM_PREMIUM_SLOT = 80
 	
 	def __init__(self):
-		self.Board = ui.ThinBoard() 
+		self.Board = ui.BoardWithTitleBar()
+		self.Board.SetTitleName('ShopCreator')
 		self.Board.SetPosition(52, 40)
-		self.Board.SetSize(350, 370)
+		self.Board.SetSize(350, 500)
 		self.Board.AddFlag('movable')
 		self.Board.Hide()
+		self.Board.SetCloseEvent(self.Hide_UI)
 		
 		self.comp = m2k_lib.Component()
-		self.Header = self.comp.TextLine(self.Board, 'Shop-Creator', 145, 8, self.comp.RGB(255, 255, 0))
-		self.Name = self.comp.TextLine(self.Board, 'Shop-Name:', 30, 310, self.comp.RGB(0, 229, 650))
+		self.Name = self.comp.TextLine(self.Board, 'Shop-Name:', 30, 440, self.comp.RGB(255, 255, 0))
 	
-		self.CloseButton = self.comp.Button(self.Board, '', 'Close', 329, 8, self.Hide_UI, 'd:/ymir work/ui/public/close_button_01.sub', 'd:/ymir work/ui/public/close_button_02.sub', 'd:/ymir work/ui/public/close_button_03.sub')
-		self.MultiplicationButton = self.comp.Button(self.Board, 'Multiplication', '', 203, 340, self.SetMultiplication, 'd:/ymir work/ui/public/large_button_01.sub', 'd:/ymir work/ui/public/large_button_02.sub','d:/ymir work/ui/public/large_button_03.sub')
-		self.MakeShopButton = self.comp.Button(self.Board, 'Make Shop', '', 61, 340, self.CreateShop, 'd:/ymir work/ui/public/large_button_01.sub', 'd:/ymir work/ui/public/large_button_02.sub','d:/ymir work/ui/public/large_button_03.sub')
-		self.ShopNameSlotbar, self.ShopNameEditline = self.comp.EditLine(self.Board, '', 100, 310, 220, 18, 34)
+		#self.CloseButton = self.comp.Button(self.Board, '', 'Close', 359, 8, self.Hide_UI, 'd:/ymir work/ui/public/close_button_01.sub', 'd:/ymir work/ui/public/close_button_02.sub', 'd:/ymir work/ui/public/close_button_03.sub')
+		self.MultiplicationButton = self.comp.OnOffButton(self.Board, '   Multiply', 'If selected, price will be multiplied by number of items', 250, 440)
+		self.MakeShopButton = self.comp.Button(self.Board, 'Make Shop', '', 130, 470, self.CreateShop, 'd:/ymir work/ui/public/large_button_01.sub', 'd:/ymir work/ui/public/large_button_02.sub','d:/ymir work/ui/public/large_button_03.sub')
+		self.ShopNameSlotbar, self.ShopNameEditline = self.comp.EditLine(self.Board, '', 95, 440, 140, 18, 25)
 		
-		iX = 82
-		eX = 10
-		y = 30
-		for line in xrange(20):
-			self.Gui["Item"+str(line+1)] = self.comp.TextLine(self.Board, 'Item'+str(line+1), iX, y, self.comp.RGB(0, 229, 650))
-			self.Gui["ItemPriceSlotBar"+str(line+1)], self.Gui["ItemPriceEditline"+str(line+1)] = self.comp.EditLine(self.Board, '0', eX, y, 67, 18, 9)
-			y+=25
-			if y == 280:
-				y = 30
-				iX = 257
-				eX = 185
+		self.startX = 15
+		self.startY = 35
+
+		self.sizeEditLine = 45
+
+		self.stepY = 19
+		self.stepX = 170
+		self.endY = 400
+
 				
-		self.ShopNameEditline.SetText(m2k_lib.ReadConfig("ShopName"))
-		self.Multiplication = int(m2k_lib.ReadConfig("Multiplication"))
+		self.ShopNameEditline.SetText(FileManager.ReadConfig("ShopName"))
+		self.MultiplicationButton.SetValue(int(FileManager.ReadConfig("Multiplication")))
+
+		self.items_ui = dict()
+		self.iniItems = []
+		self.ReloadInv()
 		
-		if self.Multiplication:
-			self.MultiplicationButton.SetText('Multiplication')
+
+	def ReloadInv(self):
+		del self.items_ui
+		if m2k_lib.GetItemByID(PREMIUM_SHOP_PACKET_ID) != -1:
+			self.MAX_NUM_SLOT = self.MAX_NUM_PREMIUM_SLOT
 		else:
-			self.MultiplicationButton.SetText('No Multiplication')
+			self.MAX_NUM_SLOT = 40
+		self.items_ui = dict()
+		self.currX = self.startX
+		self.currY = self.startY
+
+		for i in range(0, self.MAX_NUM_SLOT):
+			_id = player.GetItemIndex(i)
+			if _id in self.items_ui or _id == 0:
+				continue
+			val = FileManager.ReadConfig(str(_id),m2k_lib.CONFIG_SHOP_CREATOR)
+			item.SelectItem(_id)
+			item_name = item.GetItemName()
+			#itemIcon = item.GetIconImageFileName()
+			#self.images.append(self.comp.ExpandedImage(self.Board, self.currX, self.currY, str(itemIcon)))
+
+			if val == "":
+				val = "0"
+
+			#UI stuff
+			self.items_ui[_id] = dict()
+			self.items_ui[_id]['items_label'] = self.comp.TextLine(self.Board, item_name, self.currX + self.sizeEditLine + 5, self.currY, self.comp.RGB(0, 229, 650))
+			slot,price = self.comp.EditLine(self.Board, val, self.currX, self.currY, self.sizeEditLine, 15,10)
+			self.items_ui[_id]['item_price'] = price
+			self.items_ui[_id]['item_slot'] = slot
+
+
+			self.currY += self.stepY
+
+			if(self.currY>self.endY):
+				self.currY = self.startY
+				self.currX += self.stepX
 		
-	#	for i in xrange(20):
-	#		exec 'self.Gui["ItemPriceEditline'+ str(i+1) + '"]' + '.SetText("' + GetPrice(i) + '")'
-	#	
-	#	self.GetItems()	
-		
-	def switch_state(self):
-		if self.Board.IsShow():
-			self.Hide_UI()
-		else:
-			self.Shopw_UI()
+
 	def Shopw_UI(self):
 		self.Board.Show()
-		for line in xrange(20):
-			self.Gui["Item"+str(line+1)].Show()
-			self.Gui["ItemPriceSlotBar"+str(line+1)].Show()
-		for i in xrange(20):
-			exec 'self.Gui["ItemPriceEditline'+ str(i+1) + '"]' + '.SetText("' + GetPrice(i) + '")'
-		self.GetItems()		
 		
 	def Hide_UI(self):
 		self.Board.Hide()
-		m2k_lib.SaveConfig("ShopName", str(self.ShopNameEditline.GetText()))
-		m2k_lib.SaveConfig("Multiplication", str(self.Multiplication))
-		for i in xrange(20):
-			exec 'SavePrice("price' + str(i+1)+'", str(self.Gui["ItemPriceEditline' + str(i+1) + '"]' + '.GetText()))'
-	
+		for item in self.items_ui:
+			FileManager.WriteConfig(str(item),str(self.items_ui[item]['item_price'].GetText()),m2k_lib.CONFIG_SHOP_CREATOR)
+		FileManager.Save(FileManager.CONFIG_SHOP_CREATOR)
+		
+		FileManager.WriteConfig("ShopName", str(self.ShopNameEditline.GetText()))
+		FileManager.WriteConfig("Multiplication", str(self.MultiplicationButton.isOn))
+		FileManager.Save()
 
-	def SetMultiplication(self):
-		if self.Multiplication:
-			self.Multiplication = 0
-			self.MultiplicationButton.SetText('No Multiplication')
-			chat.AppendChat(7, '[m2k-Mod] Multiplication changed to no price nultiplication')
-		else: 
-			self.Multiplication = 1
-			self.MultiplicationButton.SetText('Multiplication')
-			chat.AppendChat(7, '[m2k-Mod] No price multiplication changed to multiplication')
+	#Put item in shop
+	def SetItemPrice(self,slot):
+		_id = player.GetItemIndex(slot)
+		if _id == 0:
+			return
+
+		str_price = self.items_ui[_id]['item_price'].GetText()
+
+		if self.MultiplicationButton.isOn:
+			won,yang = m2k_lib.ConvertPrice(str_price,player.GetItemCount(slot))
+		else:
+			won,yang = m2k_lib.ConvertPrice(str_price,1)
+
+		#Ignore items with price at 0
+		if won + yang <= 0.9: 
+			return
+
+		shop.AddPrivateShopItemStock(player.SLOT_TYPE_INVENTORY,slot,slot,yang,won)
+
 		
 	
 	def CreateShop(self):
-		price = 0
-		for i in xrange(0, 40):
-			ItemValue = player.GetItemIndex(i)
-			if ItemValue == 50300:
-				ItemValue = 100000 + player.GetItemMetinSocket(i, 0)
-			if ItemValue != 0:
-				for j in xrange(0,19):
-					if ItemValue == ListOfItems[j][0]:
-						exec 'price = int(self.Gui["ItemPriceEditline' + str(j+1) + '"]' + '.GetText())'
-				if self.Multiplication:
-					newPrice = int(price) * player.GetItemCount(i)
-				else:
-					newPrice = int(price)
-				if int(newPrice) != 0:
-					shop.AddPrivateShopItemStock(player.SLOT_TYPE_INVENTORY, int(i), int(i), int(newPrice))
-				else:
-					chat.AppendChat(7, '[m2k-Mod] Item not added to the Stock because of Price = 0')
-		shop.BuildPrivateShop(self.ShopNameEditline.GetText())
-		
-	def GetItems(self):
-		for ra in xrange(0,40):
-			ListOfItems[ra][0] = 0
-		for ri in xrange(0,40):
-			disable = 0
-			ItemValue = player.GetItemIndex(ri)
-			if ((int(ItemValue) != 0) and (ItemValue != 50300)):
-				item.SelectItem(ItemValue)
-				for i in xrange(0,29):
-					if (ListOfItems[i][0] == ItemValue):
-						disable = 1
-						break
-					else:
-						disable = 0
-				if (disable == 0):
-					for j in xrange(0,29):
-						if (ListOfItems[j][0] == 0):
-							ListOfItems[j][0] = ItemValue
-							exec 'self.Gui["Item'+ str(j + 1) + '"]' + '.SetText("' + item.GetItemName() + '")'
-							break
-			if (ItemValue == 50300):
-				sbId = player.GetItemMetinSocket(ri, 0)
-				ItemValue = 100001 + sbId
-				disable = 0
-				for i in xrange(0, 19):
-					if (ListOfItems[i][0] == ItemValue):
-						disable = 1
-						break
-					else:
-						disable = 0
-				if (disable == 0):
-					for j in xrange(0, 19):
-						if (ListOfItems[j][0] == 0):
-							ListOfItems[j][0] = ItemValue
-							exec 'self.Gui["Item' + str(j + 1) + '"]' + '.SetText("' + str(skill.GetSkillName(sbId)) + '")'
-							break
-		CountItems = 0
-		for hid in xrange(0, 20):
-			if (ListOfItems[hid][0] == 0):
-				exec 'self.Gui["Item' + str(hid+1) + '"]' + '.Hide()'
-				exec 'self.Gui["ItemPriceSlotBar' + str(hid+1) + '"]' + '.Hide()'
-			if (ListOfItems[hid][0] != 0):
-				CountItems += 1
+		if m2k_lib.GetItemByID(SHOP_PACKET_ID) == -1:
+			chat.AppendChat(3,"[Shop-Creator] You need to buy a packet first.")
+			return
 
-def GetPrice(line):
-	handle = app.OpenTextFile('m2kmod/Saves/priceconfig.m2k')
-	t = app.GetTextFileLine(handle, line)
-	return t.split('=')[1]
-		
-def SavePrice(Setting, Value):
-	sReader = open('m2kmod/Saves/priceconfig.m2k', 'r')
-	sLines = file.readlines(sReader)
-	sWriter = open('m2kmod/Saves/priceconfig.m2k', 'w')
-	for Line in sLines:
-		if Line.startswith(Setting + '='):
-			Line = Setting + '=' + Value + '\n'
-		sWriter.write(Line)
+		self.iniItems = []
+		self.initItems = list(self.items_ui.keys())
+		for i in range(0, self.MAX_NUM_SLOT):
+			idx = player.GetItemIndex(i)
+			if idx == SHOP_PACKET_ID or idx == PREMIUM_SHOP_PACKET_ID:
+				continue
+			#if ItemValue == 50300:
+			#	ItemValue = 100000 + player.GetItemMetinSocket(i, 0)
+			#if ItemValue != 0:
+			self.SetItemPrice(i)
+		shop.BuildPrivateShop(self.ShopNameEditline.GetText())
+
+
+_shop = ShopDialog()
+
+def switch_state():
+	if _shop.Board.IsShow():
+		_shop.Hide_UI()
+	else:
+		_shop.ReloadInv()
+		_shop.Shopw_UI()
