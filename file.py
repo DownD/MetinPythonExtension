@@ -1,9 +1,12 @@
-from m2kmod.Modules import Levelbot, UIComponents
+#from OpenBot.Modules import Levelbot, UIComponents
 import net_packet,ui,net,chr,player,chat,shop,item,game,Levelbot,BotBase
-import m2k_lib,game,Hooks,ShopNPC,Movement,FishingBot,event,background,Hooks,ShopNPC,FileManager,Inventorymanager,MapManager,localeInfo,playerm2g2,app,uiRestart,uiScriptLocale
-import itertools,Settings,DmgHacks
-#reload(MapManager)
-reload(FileManager)
+import OpenLib,game,Hooks,ShopNPC,Movement,FishingBot,event,background,Hooks,ShopNPC,FileManager,Inventorymanager,MapManager,localeInfo,playerm2g2,app,uiRestart,uiScriptLocale
+import itertools,Settings,DmgHacks,game,interfaceModule,uiPrivateShopBuilder,uiPrivateShopSearch
+import MiningBot
+#reload(DmgHacks)
+#reload(MiningBot)
+reload(MapManager)
+#reload(FileManager)
 #reload(MapManager)
 ##reload(Inventorymanager)
 #reload(Movement)
@@ -14,14 +17,56 @@ reload(FileManager)
 #reload(FileManager)
 #reload(BotBase)
 #reload(Levelbot)
-reload(Settings)
 #reload(DmgHacks)
 #reload(ShopNPC)
+
+chat.AppendChat(3,str(background.GetCurrentMapName()))
+#buffer_vid = 0
+#sum = 0
+#for vid in net_packet.InstancesList:
+#	sum += vid
+#	if vid > buffer_vid:
+#		buffer_vid = vid
+#chat.AppendChat(3,str(sum/len(net_packet.InstancesList)))
+#chat.AppendChat(3,str(MapManager.maps))
+
+for key in MapManager.maps.keys():
+	chat.AppendChat(3,str(key))
+#net.SendOnClickPacket(7952911)
+#mining_glitch.clearInstances()
+#for x in range(7900571,7901572):
+#	net.SendOnClickPacket(x)
+##chat.AppendChat(3,"TEST")
+##net.SendPrivateShopSearchInfo()
+#chat.AppendChat(3,str(mining_glitch.getFoundOres()))
+##net.SendOnClickPacket(7625674)
+
 #
+#chat.AppendChat(3,str(uiPrivateShopBuilder.g_privateShopAdvertisementBoardDict.keys()))
+
+#vid = player.GetTargetVID()
+#
+#
+#mob_x, mob_y, mob_z = chr.GetPixelPosition(vid)
+#net_packet.SendAddFlyTarget(vid,mob_x, mob_y)
+#net_packet.SendShoot(net_packet.COMBO_SKILL_ARCH)
+
+#OpenLib.extractFile('d:/ymir work/ui/metin2_map_privateshop_atlas.dds')
 #links  = MapManager.GetMapPath(background.GetCurrentMapName(),'metin2_map_trent02')
 #for link in links:
-#    name = link.GetOriginMapName()
-#    chat.AppendChat(3,str(name))
+#def interceptAppear(*args,**kwargs):
+#	global private_shop_func
+#	chat.AppendChat(3,str(args)+str(kwargs))
+#	return private_shop_func.CallOriginalFunction(*args,**kwargs)
+#
+#private_shop_func = Hooks.Hook(interfaceModule.Interface.AppearPrivateShop,interceptAppear)
+#private_shop_func.HookFunction()
+#chat.AppendChat(3,"Done")
+#chat.AppendChat(3,str(localeInfo.TOOLTIP_APPLY_RESIST_WARRIOR()))
+
+#net.DirectEnter(1)
+
+#chat.AppendChat(3,"Test")
 
 #map = MapManager.GetMap()
 #
@@ -33,14 +78,14 @@ reload(Settings)
 #for map_name,link in map.links.iteritems():
 #    name = link.GetDestMapName()
 #    chat.AppendChat(3,str(name))
-#reload(m2k_lib)
+#reload(OpenLib)
 #reload(Movement)
 #reload(FishingBot)
 #Movement.GoToPositionAvoidingObjects(50000,50000,mapName="metin2_map_c1")
 #Movement.StopMovement()
 #Hooks._debugUnhookFunctionArgs()
-#Hooks._debugHookFunctionArgs(net.SendItemMovePacket)
-#reload(m2k_lib)
+#Hooks._debugHookFunctionArgs(net.SendPrivateShopSearchInfo)
+#reload(OpenLib)
 #Hooks._debugHookFunctionArgs(net.SetPhaseWindow)
 #net.SendItemMovePacket(2,3,5)
 #npcs = MapManager.GetMap().npcs
@@ -58,19 +103,23 @@ reload(Settings)
 
 #x,y,z = player.GetMainCharacterPosition()
 #vid,itemX,itemY = net_packet.GetCloseItemGround(x,y)
-#dst = m2k_lib.dist(x,y,itemX,itemY)
+#dst = OpenLib.dist(x,y,itemX,itemY)
 #net_packet.SendPickupItem(vid)
 #
-##Hooks.questHook.UnhookFunction()
-chat.AppendChat(3,str(m2k_lib.MAX_PICKUP_DIST))
+#name_file = str(net.GetServerInfo().split(',')[0]) + ".items"
+#name_convert = "convertSend.py "
+###Hooks.questHook.UnhookFunction()
+#os.system('cd ' + net_packet.PATH + " && python " + name_convert+ " "+ name_file )
+##os.system('python ' +  name_convert + name_file)
+#chat.AppendChat(3,str('python ' +  name_convert + name_file))
 ##for link in maps:
 #chat.AppendChat(3,str(dst))
 
 #net.SendItemDropPacketNew(0,player.GetItemCount(0))
-#m2k_lib.StackItems()
+#OpenLib.StackItems()
 #net.SendShopSellPacketNew(0,player.GetItemCount(0),1)
 
-#from m2kmod.Modules import Hooks
+#from OpenBot.Modules import Hooks
 #reload(FishingBot)
 #reload(ShopNPC)
 #Hooks._debugUnhookFunctionArgs()
@@ -89,7 +138,12 @@ chat.AppendChat(3,str(m2k_lib.MAX_PICKUP_DIST))
 #event.SelectAnswer(1,0)
 #event.SelectAnswer(0,1)
 #
+#vid = player.GetTargetVID()
+#chat.AppendChat(3,str(player.GetTargetVID()))
+#chat.AppendChat(3,str(OpenLib.isPlayerCloseToInstance(vid)))
+#chat.AppendChat(3,str(OpenLib.GetCurrentPhase()))
 
+#net.DirectEnter(0,0)
 #chat.AppendChat(3,str(net_packet.IsPositionBlocked(33600,22200)))
 
 #for i in range(0,10):
@@ -102,7 +156,7 @@ chat.AppendChat(3,str(m2k_lib.MAX_PICKUP_DIST))
 #chat.AppendChat(3,str(player.GetItemIndex(0)))
 
 #name = background.GetCurrentMapName()
-#m2k_lib.extractFile(name+str())
+#OpenLib.extractFile(name+str())
 #reload(FishingBot)
 #reload(ShopNPC)
 
@@ -111,8 +165,8 @@ chat.AppendChat(3,str(m2k_lib.MAX_PICKUP_DIST))
 #event.SelectAnswer(1,0)
 #event.SelectAnswer(2,0)
 
-#Hooks._debugHookFunctionArgs(net.SendShopSellPacketNew)
-#Hooks._debugUnhookFunctionArgs(net.SendShopSellPacketNew)
+#Hooks._debugHookFunctionArgs(net.DirectEnter)
+#Hooks._debugUnhookFunctionArgs()
 #net.SendGiveItemPacket(player.GetTargetVID(),player.SLOT_TYPE_INVENTORY,0,1)
 #event.SelectAnswer(1,0)
 #event.SelectAnswer(2,0)
@@ -142,7 +196,6 @@ chat.AppendChat(3,str(m2k_lib.MAX_PICKUP_DIST))
 #ROD##
 #To get rod current level use player.GetItemMetinSocket(slot,0)
 #To get rod maxLevel level use item.GetValue(2) after select the item
-
 
 #Possible Inventory type
 #player module
