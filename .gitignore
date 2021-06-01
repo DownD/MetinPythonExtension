@@ -1,6 +1,7 @@
-/**/*.pyo
+/**/*.pyc
 Injector.exe
-file.pyo
+dMetinWx.dll
+file.pyc
 /skills
 /scripts
 /Modules/Dev
