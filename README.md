@@ -17,7 +17,7 @@ A Bot/Mod that adds complex functionality to the metin2 client. It needs be used
 - Auto buy/sell
 
 ## Preview
-![image info](https://i.gyazo.com/25b54da88d8b8696f03b7e0cec5d76f7.jpg)
+![image info](https://i.gyazo.com/b1fa500eeaadabc1be91cc7b89782647.jpg)
 
 ## Usefull documented helper modules
 This are modules built to be integrated with scripts, they provide an interface to complex functionality like walking with pathfinding or creating UI ingame.
