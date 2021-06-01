@@ -16,6 +16,8 @@ A Bot/Mod that adds complex functionality to the current oficial metin2 client. 
 - Teleport
 - Auto buy/sell
 
+## Preview
+![image info](https://i.gyazo.com/25b54da88d8b8696f03b7e0cec5d76f7.jpg)
 
 ## Usefull documented helper modules
 This are modules built to be integrated with scripts, they provide an interface to complex functionality like walking with pathfinding or creating UI ingame.
@@ -55,3 +57,10 @@ Load MetinWx.dll into process while in character select mode or while choosing t
 - portals might be available at atlasinfo.txt inside locale
 - maybe OX questions in locale_quiz.txt inside locale?
 
+
+## Notes
+- init.py needs to be changed in case the server changes critical modules or functions
+
+# Problems
+- Path finding might be slow on complex maps like red forest
+- Auto sell not working
