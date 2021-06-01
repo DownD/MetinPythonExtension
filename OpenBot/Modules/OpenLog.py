@@ -8,5 +8,6 @@ def DebugPrint(arg):
 	Args:
 		arg ([str]): Informatio to log.
 	"""
-	with open(net_packet.PATH+"\\Log.txt","a") as f:
-		f.write(str(datetime.now())+": "+arg+"\n")
+	#with open(net_packet.PATH+"\\Log.txt","a") as f:
+		#f.write(str(datetime.now())+": "+arg+"\n")
+	pass

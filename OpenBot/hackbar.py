@@ -1,6 +1,6 @@
 import ui,app,chat,chr,net,player,wndMgr,uiCommon,net_packet
 from OpenBot.Modules import OpenLog,Hooks,OpenLib,FileManager,MapManager,Movement,ShopNPC,UIComponents,BotBase,ShopSearcher,Telehack, PythonManager, Settings, Levelbot, Spambot, Shopcreator, Inventorymanager, FishingBot
-DEBUG = True
+DEBUG = net_packet.IS_DEBUG
 if DEBUG:
 	from OpenBot.Modules import Filter, MiningBot
 
