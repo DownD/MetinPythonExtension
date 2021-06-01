@@ -2,7 +2,7 @@ import ui,app,chat,chr,net,player,wndMgr,uiCommon,net_packet
 from OpenBot.Modules import OpenLog,Hooks,OpenLib,FileManager,MapManager,Movement,ShopNPC,UIComponents,BotBase,ShopSearcher,Telehack, PythonManager, Settings, Levelbot, Spambot, Shopcreator, Inventorymanager, FishingBot
 DEBUG = True
 if DEBUG:
-	from OpenBot.Modules.Dev import Filter, MiningBot
+	from OpenBot.Modules import Filter, MiningBot
 
 class OpenBotHackbarDialog(ui.ScriptWindow): 				
 	
