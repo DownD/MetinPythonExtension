@@ -1,7 +1,7 @@
 # MetinPythonBot
-THIS PROJECT WAS BUILT FOR EDUCATIONAL AND LEARNING PURPOSES ONLY!
-This is a long term project built with C++/Python in order to explore my skills as a programmer and reverse engineer.
-A Bot/Mod that adds complex functionality to the current oficial metin2 client. It needs be used with my c++ python library (Metin2Wx.dll), it will not work without it.
+THIS PROJECT WAS BUILT FOR EDUCATIONAL AND LEARNING PURPOSES ONLY!<br>
+This is a long term project built with C++/Python in order to explore my skills as a programmer and reverse engineer.<br>
+A Bot/Mod that adds complex functionality to the metin2 client. It needs be used with my c++ python library (Metin2Wx.dll), it will not work without it.<br>
 
 ## Functions
 - PathFinding (Even across maps)
