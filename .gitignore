@@ -1,6 +1,8 @@
-/**/*.pyo
+/**/*.pyc
 Injector.exe
-file.pyo
+dMetinWx.dll
+file.pyc
 /skills
 /scripts
-/Modules/Dev
+/OpenBot/Modules/MiningBot.py
+/OpenBot/Modules/Filter.py
