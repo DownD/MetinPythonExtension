@@ -6,3 +6,5 @@ file.pyc
 /scripts
 /OpenBot/Modules/MiningBot.py
 /OpenBot/Modules/Filter.py
+*.pdb
+dMetinWx.dll
