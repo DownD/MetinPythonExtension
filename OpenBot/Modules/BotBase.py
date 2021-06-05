@@ -1,5 +1,5 @@
 import Movement
-import ui,OpenLib,ShopNPC,DmgHacks,player
+import ui,OpenLib,NPCInteraction,DmgHacks,player
 import abc
 class BotBase(ui.ScriptWindow):
 	""" 
@@ -104,7 +104,7 @@ class BotBase(ui.ScriptWindow):
 		"""
 		self.StopBot()
 		self.__SetStateStopped()
-		ShopNPC.StopAction()
+		NPCInteraction.StopAction()
 		
 ###########################
 ####Abstract Functions######

@@ -1,5 +1,5 @@
-from OpenBot.Modules.ShopNPC import NPCAction
-import net_packet,OpenLib,os,net,FileManager,player,chat,background,ShopNPC
+from OpenBot.Modules.NPCInteraction import NPCAction
+import net_packet,OpenLib,os,net,FileManager,player,chat,background,NPCInteraction
 
 
 
@@ -30,7 +30,7 @@ CDD_2_KINDOMS = {
 #And contains the action requires to got to the desired map
 class MapLink():
 	def __init__(self,x,y,map_origin,map_dest,race=0,event_answer = []):
-		self.npc_action = ShopNPC.NPCAction(race,(x,y),event_answer,map_origin)
+		self.npc_action = NPCInteraction.NPCAction(race,(x,y),event_answer,map_origin)
 		self.map_origin = map_origin
 		self.map_dest = map_dest
 		#chat.AppendChat(3,"Origin: " + str(map_origin) + " Dest: " + str(map_dest))
@@ -244,7 +244,7 @@ def GetMapPath(map_name_end,map_name_start=background.GetCurrentMapName()):
 		chat.AppendChat(3,str(links))
 		return links
 	else:
-		chat.AppendChat(3,"[Map-Manager] Map is not configured.")
+		chat.AppendChat(3,"[Map-Manager] Either " + map_name_start+" or "+ map_name_end + " are not configured.")
 		return []
 
 def GetMap(map_name=background.GetCurrentMapName()):
@@ -266,7 +266,7 @@ def GetClosestMapPathWithNPC(npc_race,map_name_start=background.GetCurrentMapNam
 
 		return [],None
 	else:
-		chat.AppendChat(3,"[Map-Manager] Map is not configured.")
+		chat.AppendChat(3,"[Map-Manager] Map " + map_name_start +" is not configured.")
 		return [],None
 
 #Return the closest position of the NPC in the sapecified map

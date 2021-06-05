@@ -28,7 +28,7 @@ All this modules are documented.
 - <b>Movement</b>: Provide movement and teleport functions.
 - <b>OpenLib</b>: Main lib containing a lot of helper functions.
 - <b>OpenLog</b>: Very simple module for loging informations.
-- <b>ShopNPC</b>: To be changed.
+- <b>NPCInteraction</b>: Allows for interaction with NPC's.
 - <b>UIComponents</b>: Contains high level functions to draw on top UI components.
 
 Try to avoid usage of other modules not referenced here for creating aditional functionality, as other modules are more complex and more prone to error.
@@ -46,8 +46,8 @@ Main configurations files, if the files are not mentioned here, it either means 
 
 - <b>Saves:</b>
 Unlike the Maps files, the next specific files are not automatically created and need to be updated, in case a map is not set currently.
--- <b>map_linker.txt</b>: Contains the links between maps, only yhe links contained in this file will be used too look for path across maps.
--- <b>NpcMaps/map_name.npcs</b>: Contains all npc's in that map with the following identation("race x y")
+- - <b>map_linker.txt</b>: Contains the links between maps, only yhe links contained in this file will be used too look for path across maps.
+- - <b>NpcMaps/map_name.npcs</b>: Contains all npc's in that map with the following identation("race x y")
 
 ## How to load it
 Load MetinWx.dll into process while in character select mode or while choosing the channel.

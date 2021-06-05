@@ -25,7 +25,6 @@ class DmgHacks(ui.Window):
 		self.comp = UIComponents.Component()
 
 		self.enableButton = self.comp.OnOffButton(self.Board, '', '', 130, 200, OffUpVisual='OpenBot/Images/start_0.tga', OffOverVisual='OpenBot/Images/start_1.tga', OffDownVisual='OpenBot/Images/start_2.tga',OnUpVisual='OpenBot/Images/stop_0.tga', OnOverVisual='OpenBot/Images/stop_1.tga', OnDownVisual='OpenBot/Images/stop_2.tga' )
-		self.MetinButton = self.comp.OnOffButton(self.Board, '', 'Only attack metins', 220, 40,image="OpenBot/Images/General/metin.tga")
   		self.playerClose = self.comp.OnOffButton(self.Board, '', '', 130, 50)
 		self.RangeLabel = self.comp.TextLine(self.Board, 'Range', 13, 92, self.comp.RGB(255, 255, 255))
 		self.SpeedLabel = self.comp.TextLine(self.Board, 'Speed', 13, 126, self.comp.RGB(255, 255, 255))
@@ -53,13 +52,11 @@ class DmgHacks(ui.Window):
 		self.MonsterSlider.SetSliderPos(float(FileManager.ReadConfig("WaitHack_MaxMonsters")))
 		self.SpeedSlider.SetSliderPos(float(FileManager.ReadConfig("WaitHack_Speed")))
 		self.RangeSlider.SetSliderPos(float(FileManager.ReadConfig("WaitHack_Range")))
-		self.MetinButton.SetValue(boolean(FileManager.ReadConfig("WaitHack_MetinAttack")))
 		self.playerClose.SetValue(boolean(FileManager.ReadConfig("WaitHack_PlayerClose")))
 	def saveSettings(self):
 		FileManager.WriteConfig("WaitHack_MaxMonsters", str(self.MonsterSlider.GetSliderPos()))
 		FileManager.WriteConfig("WaitHack_Speed", str(self.SpeedSlider.GetSliderPos()))
 		FileManager.WriteConfig("WaitHack_Range", str(self.RangeSlider.GetSliderPos()))
-		FileManager.WriteConfig("WaitHack_MetinAttack", str(self.MetinButton.isOn))
 		FileManager.WriteConfig("WaitHack_PlayerClose", str(self.playerClose.isOn))
 		FileManager.Save()
 	

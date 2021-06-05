@@ -1,5 +1,5 @@
 import net_packet,ui,net,chr,player,chat,item
-import OpenLib,ShopNPC,FileManager,Movement,UIComponents
+import OpenLib,NPCInteraction,FileManager,Movement,UIComponents
 from FileManager import boolean
 
 def _PositionRestoreCallback():
@@ -174,7 +174,7 @@ class FishingBotDialog(ui.Window):
 
 	def StartStopEvent(self,val):
 		if not val:
-			ShopNPC.StopAction()
+			NPCInteraction.StopAction()
 			self.exitFishing()
 		else:
 			self.startPosition = player.GetMainCharacterPosition()
@@ -236,7 +236,7 @@ class FishingBotDialog(ui.Window):
 			return
 
 		chat.AppendChat(3,"[Fishing-Bot] Request to shop sent")
-		ShopNPC.RequestGiveItemNPCAwayRestorePosition([slot],ShopNPC.GetFishermanUpgrade(),callback=_PositionRestoreCallback,pos=self.startPosition)
+		NPCInteraction.RequestGiveItemNPCAwayRestorePosition([slot],NPCInteraction.GetFishermanUpgrade(),callback=_PositionRestoreCallback,pos=self.startPosition)
 		self.isMoving = True
 	
 	def GrillFishes(self,vid):
@@ -273,7 +273,7 @@ class FishingBotDialog(ui.Window):
 		to_buy = []
 		if not has_worms:
 			for i in range(0,5):
-				to_buy.append(6)
+				to_buy.append(7)
 		
 		if not has_fire:
 			to_buy.append(1)
@@ -281,9 +281,9 @@ class FishingBotDialog(ui.Window):
 		self.isMoving = True
 
 		#GoShop and use campfire
-		ShopNPC.RequestBusinessNPCAway(to_buy,to_sell,ShopNPC.GetFishermanShop(),callback=_PlaceFireCallBack)
+		NPCInteraction.RequestBusinessNPCAway(to_buy,to_sell,NPCInteraction.GetFishermanShop(),callback=_PlaceFireCallBack)
 		chat.AppendChat(3,"[Fishing-Bot] Selling slots: "+str(to_sell))
-		#ShopNPC.RequestBusinessNPCAwayRestorePosition(to_buy,to_sell,ShopNPC.FISHERMAN_SHOP,callback=_PositionRestoreCallback,pos=self.startPosition)
+		#NPCInteraction.RequestBusinessNPCAwayRestorePosition(to_buy,to_sell,NPCInteraction.FISHERMAN_SHOP,callback=_PositionRestoreCallback,pos=self.startPosition)
 		self.SetState(self.STATE_GOING_TO_SHOP)
 
 	def exitFishing(self):		

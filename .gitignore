@@ -2,9 +2,11 @@
 Injector.exe
 dMetinWx.dll
 file.pyc
+file.py
 /skills
 /scripts
 /OpenBot/Modules/MiningBot.py
 /OpenBot/Modules/Filter.py
 *.pdb
 dMetinWx.dll
+Log.txt

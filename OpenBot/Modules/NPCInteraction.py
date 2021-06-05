@@ -126,7 +126,7 @@ def GetGeneralShop():
 
 
 #Call SetOrder to set npc and order and call StartNPCBusiness aftwerwards to start business
-class ShopNPCDialog(ui.ScriptWindow):
+class NPCInteractionDialog(ui.ScriptWindow):
 	def __init__(self):
 		ui.ScriptWindow.__init__(self)
 		self.Show()
@@ -153,7 +153,7 @@ class ShopNPCDialog(ui.ScriptWindow):
 		if open_shop:
 			if not self.OpenShop():
 				self.State = STATE_FINISH_SHOPPING
-				chat.AppendChat(3,"[ShopNPC] NPC with Race:"+str(self.npcAction.race)+" is not close by")
+				chat.AppendChat(3,"[NPCInteraction] NPC with Race:"+str(self.npcAction.race)+" is not close by")
 				return False
 		self.State = STATE_WAITING_OPEN_SHOP
 		return True
@@ -382,7 +382,7 @@ def StopAction():
 	Hooks.questHook.UnhookFunction()
 
 
-instance = ShopNPCDialog()
+instance = NPCInteractionDialog()
 		  
 		
 		

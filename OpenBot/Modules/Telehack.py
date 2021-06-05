@@ -124,6 +124,7 @@ class TeleportHackDialog(ui.ScriptWindow):
 		if self.IsShow():
 			self.Hide()
 		else:
+			chat.AppendChat(3,"[Teleport] To move/teleport to a location press shift with the mouse over the location.")
 			self.Show()
 
 	def ChangeMode(self):
